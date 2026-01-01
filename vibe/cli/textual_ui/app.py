@@ -880,6 +880,23 @@ class VibeApp(App):  # noqa: PLR0904
         return self.agent.interaction_logger.session_id[:8]
 
     async def _exit_app(self) -> None:
+        agent = getattr(self, "agent", None)
+        if agent and getattr(agent, "session_title", None) is None:
+            try:
+                await agent.add_title()
+            except Exception:
+                try:
+                    agent.session_title = "untitled session"
+                    await agent.interaction_logger.save_interaction(
+                        agent.messages,
+                        agent.stats,
+                        agent.config,
+                        agent.tool_manager,
+                        session_title=agent.session_title,
+                    )
+                except Exception:
+                    pass
+
         self.exit(result=self._get_session_resume_info())
 
     async def _setup_terminal(self) -> None:
@@ -1131,10 +1148,17 @@ class VibeApp(App):  # noqa: PLR0904
         self.action_force_quit()
 
     def action_force_quit(self) -> None:
+        self.run_worker(self._force_quit_and_exit(), exclusive=False)
+
+    async def _force_quit_and_exit(self) -> None:
         if self._agent_task and not self._agent_task.done():
             self._agent_task.cancel()
+            try:
+                await self._agent_task
+            except asyncio.CancelledError:
+                pass
 
-        self.exit(result=self._get_session_resume_info())
+        await self._exit_app()
 
     def action_scroll_chat_up(self) -> None:
         try:
