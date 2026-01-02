@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import asyncio
 from enum import StrEnum, auto
+import json
+from pathlib import Path
 import subprocess
 import time
 from typing import Any, ClassVar, assert_never
@@ -28,6 +30,7 @@ from vibe.cli.textual_ui.widgets.chat_input import ChatInputContainer
 from vibe.cli.textual_ui.widgets.compact import CompactMessage
 from vibe.cli.textual_ui.widgets.config_app import ConfigApp
 from vibe.cli.textual_ui.widgets.context_progress import ContextProgress, TokenState
+from vibe.cli.textual_ui.widgets.history_app import HistoryApp, HistoryDefinition
 from vibe.cli.textual_ui.widgets.loading import LoadingWidget
 from vibe.cli.textual_ui.widgets.messages import (
     AssistantMessage,
@@ -71,6 +74,7 @@ from vibe.core.utils import (
 class BottomApp(StrEnum):
     Approval = auto()
     Config = auto()
+    History = auto()
     Input = auto()
 
 
@@ -318,6 +322,17 @@ class VibeApp(App):  # noqa: PLR0904
                 UserCommandMessage("Configuration closed (no changes saved).")
             )
 
+        await self._switch_to_input_app()
+
+    async def on_history_app_history_closed(
+        self, message: HistoryApp.HistoryClosed
+    ) -> None:
+        if message.changes:
+            await self._mount_and_scroll(UserCommandMessage("History closed."))
+        else:
+            await self._mount_and_scroll(
+                UserCommandMessage("History closed (no changes saved).")
+            )
         await self._switch_to_input_app()
 
     def _set_tool_permission_always(
@@ -674,6 +689,66 @@ class VibeApp(App):  # noqa: PLR0904
         help_text = self.commands.get_help_text()
         await self._mount_and_scroll(UserCommandMessage(help_text))
 
+    async def _restore_session(self) -> None:
+        """Switch to the History app in the bottom panel."""
+        if self._current_bottom_app == BottomApp.History:
+            return
+        await self._get_and_switch_to_history_app()
+
+    async def _get_and_switch_to_history_app(self) -> None:
+        """Load saved sessions and show the history app."""
+        await self._mount_and_scroll(UserCommandMessage("History opened..."))
+
+        sessions: list[HistoryDefinition] = []
+        try:
+            save_dir = Path(self.config.session_logging.save_dir)
+            prefix = self.config.session_logging.session_prefix or "session"
+            pattern = f"{prefix}_*.json"
+            if save_dir.exists():
+                files = sorted(
+                    save_dir.glob(pattern),
+                    key=lambda p: p.stat().st_mtime,
+                    reverse=True,
+                )
+                for p in files:
+                    try:
+                        content = p.read_text(encoding="utf-8")
+                        data = json.loads(content)
+                        meta = data.get("metadata", {}) or {}
+                        sid = meta.get("session_id") or p.stem.split("_")[-1]
+                        title = meta.get("session_title") or ""
+                        sessions.append({
+                            "session_id": str(sid)[:8],
+                            "session_title": str(title),
+                        })
+                    except Exception:
+                        continue
+        except Exception as e:
+            await self._mount_and_scroll(
+                ErrorMessage(
+                    f"Failed to read session logs: {e}", collapsed=self._tools_collapsed
+                )
+            )
+
+        try:
+            from vibe.core.paths.config_paths import HISTORY_FILE
+
+            HISTORY_FILE.path.parent.mkdir(parents=True, exist_ok=True)
+            with HISTORY_FILE.path.open("w", encoding="utf-8") as f:
+                for session in sessions:
+                    sid = session["session_id"]
+                    title = session["session_title"]
+                    line = f"{sid} {title}\n" if title else f"{sid}\n"
+                    f.write(line)
+        except Exception as e:
+            await self._mount_and_scroll(
+                ErrorMessage(
+                    f"Failed to write history file: {e}",
+                    collapsed=self._tools_collapsed,
+                )
+            )
+        await self._switch_to_history_app(sessions)
+
     async def _show_status(self) -> None:
         if self.agent is None:
             await self._mount_and_scroll(
@@ -920,6 +995,29 @@ class VibeApp(App):  # noqa: PLR0904
                 ErrorMessage(result.message, collapsed=self._tools_collapsed)
             )
 
+    async def _switch_to_history_app(self, sessions: list[HistoryDefinition]) -> None:
+        if self._current_bottom_app == BottomApp.History:
+            return
+
+        bottom_container = self.query_one("#bottom-app-container")
+        try:
+            chat_input_container = self.query_one(ChatInputContainer)
+            await chat_input_container.remove()
+        except Exception:
+            pass
+
+        if self._mode_indicator:
+            self._mode_indicator.display = False
+
+        history_app = HistoryApp(
+            self.config,
+            history=sessions,
+            has_terminal_theme=self._terminal_theme is not None,
+        )
+        await bottom_container.mount(history_app)
+        self._current_bottom_app = BottomApp.History
+        self.call_after_refresh(history_app.focus)
+
     async def _switch_to_config_app(self) -> None:
         if self._current_bottom_app == BottomApp.Config:
             return
@@ -980,6 +1078,12 @@ class VibeApp(App):  # noqa: PLR0904
             pass
 
         try:
+            history_app = self.query_one("#history-app")
+            await history_app.remove()
+        except Exception:
+            pass
+
+        try:
             approval_app = self.query_one("#approval-app")
             await approval_app.remove()
         except Exception:
@@ -1031,6 +1135,15 @@ class VibeApp(App):  # noqa: PLR0904
             try:
                 config_app = self.query_one(ConfigApp)
                 config_app.action_close()
+            except Exception:
+                pass
+            self._last_escape_time = None
+            return
+
+        if self._current_bottom_app == BottomApp.History:
+            try:
+                history_app = self.query_one(HistoryApp)
+                history_app.action_close()
             except Exception:
                 pass
             self._last_escape_time = None
