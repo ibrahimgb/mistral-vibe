@@ -2,9 +2,6 @@ from __future__ import annotations
 
 import asyncio
 from enum import StrEnum, auto
-import json
-import os
-from pathlib import Path
 import subprocess
 import time
 from typing import Any, ClassVar, assert_never
@@ -16,7 +13,7 @@ from textual.binding import Binding, BindingType
 from textual.containers import Horizontal, VerticalScroll
 from textual.events import AppBlur, AppFocus, MouseUp
 from textual.widget import Widget
-from textual.widgets import Input, Static
+from textual.widgets import Static
 
 from vibe import __version__ as CORE_VERSION
 from vibe.cli.clipboard import copy_selection_to_clipboard
@@ -83,7 +80,6 @@ def _save_api_key_to_env_file(env_key: str, api_key: str) -> None:
 class BottomApp(StrEnum):
     Approval = auto()
     Config = auto()
-    History = auto()
     APIKey = auto()
     Input = auto()
 
@@ -377,23 +373,6 @@ class VibeApp(App):  # noqa: PLR0904
             await self._mount_and_scroll(
                 UserCommandMessage("API key closed (no changes saved).")
             )
-        await self._switch_to_input_app()
-
-    async def on_history_app_history_closed(
-        self, message: HistoryApp.HistoryClosed
-    ) -> None:
-        if message.changes:
-            await self._mount_and_scroll(UserCommandMessage("History closed."))
-        else:
-            await self._mount_and_scroll(
-                UserCommandMessage("History closed (no changes saved).")
-            )
-        await self._switch_to_input_app()
-
-    async def on_history_app_session_selected(
-        self, message: HistoryApp.SessionSelected
-    ) -> None:
-        await self._load_session_from_history(message.session["session_id"])
         await self._switch_to_input_app()
 
     def _set_tool_permission_always(
@@ -1136,15 +1115,6 @@ class VibeApp(App):  # noqa: PLR0904
             try:
                 config_app = self.query_one(ConfigApp)
                 config_app.action_close()
-            except Exception:
-                pass
-            self._last_escape_time = None
-            return
-
-        if self._current_bottom_app == BottomApp.History:
-            try:
-                history_app = self.query_one(HistoryApp)
-                history_app.action_close()
             except Exception:
                 pass
             self._last_escape_time = None
