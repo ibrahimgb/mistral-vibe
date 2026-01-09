@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from enum import StrEnum, auto
+import os
 import subprocess
 import time
 from typing import Any, ClassVar, assert_never
@@ -25,6 +26,7 @@ from vibe.cli.textual_ui.terminal_theme import (
 )
 from vibe.cli.textual_ui.widgets.approval_app import ApprovalApp
 from vibe.cli.textual_ui.widgets.chat_input import ChatInputContainer
+from vibe.cli.textual_ui.widgets.chat_scroll import ChatScroll
 from vibe.cli.textual_ui.widgets.compact import CompactMessage
 from vibe.cli.textual_ui.widgets.config_app import ConfigApp
 from vibe.cli.textual_ui.widgets.context_progress import ContextProgress, TokenState
@@ -44,6 +46,7 @@ from vibe.cli.textual_ui.widgets.mode_indicator import ModeIndicator
 from vibe.cli.textual_ui.widgets.no_markup_static import NoMarkupStatic
 from vibe.cli.textual_ui.widgets.path_display import PathDisplay
 from vibe.cli.textual_ui.widgets.tools import ToolCallMessage, ToolResultMessage
+from vibe.cli.textual_ui.widgets.virtual_messages import VirtualMessages
 from vibe.cli.textual_ui.widgets.welcome import WelcomeBanner
 from vibe.cli.update_notifier import (
     FileSystemUpdateCacheRepository,
@@ -153,9 +156,24 @@ class VibeApp(App):  # noqa: PLR0904
         return self.agent.config if self.agent else self._config
 
     def compose(self) -> ComposeResult:
-        with VerticalScroll(id="chat"):
+        # Keep the default UI structure stable for determinism (e.g. snapshot tests).
+        # Virtualization is an opt-in performance mode.
+        #
+        # Why: mounting thousands of per-message widgets can make scrolling sluggish.
+        # The virtualized mode keeps the same widget-per-message UI, but only mounts
+        # viewport-adjacent messages. We keep it opt-in to avoid changing baseline
+        # rendering (including snapshot output) unless explicitly enabled.
+        use_virtual_messages = os.environ.get("VIBE_TEXTUAL_VIRTUAL_MESSAGES") == "1"
+
+        with (
+            ChatScroll(id="chat") if use_virtual_messages else VerticalScroll(id="chat")
+        ):
             yield WelcomeBanner(self.config)
-            yield Static(id="messages")
+            yield (
+                VirtualMessages(id="messages")
+                if use_virtual_messages
+                else Static(id="messages")
+            )
 
         with Horizontal(id="loading-area"):
             yield Static(id="loading-area-content")
@@ -212,6 +230,10 @@ class VibeApp(App):  # noqa: PLR0904
 
         if self._loaded_messages:
             await self._rebuild_history_from_messages()
+
+        # This is a no-op unless virtualization is enabled: `_update_message_virtualization`
+        # is defensive and simply returns if the virtual widgets aren't present.
+        self.call_after_refresh(self._update_message_virtualization)
 
         if self._initial_prompt:
             self.call_after_refresh(self._process_initial_prompt)
@@ -1254,6 +1276,8 @@ class VibeApp(App):  # noqa: PLR0904
         if was_at_bottom:
             self.call_after_refresh(self._anchor_if_scrollable)
 
+        self.call_after_refresh(self._update_message_virtualization)
+
     def _is_scrolled_to_bottom(self, scroll_view: VerticalScroll) -> bool:
         try:
             threshold = 3
@@ -1279,6 +1303,23 @@ class VibeApp(App):  # noqa: PLR0904
             if chat.max_scroll_y == 0:
                 return
             chat.anchor()
+        except Exception:
+            pass
+
+    def _update_message_virtualization(self) -> None:
+        try:
+            chat = self.query_one("#chat", ChatScroll)
+            messages = self.query_one("#messages", VirtualMessages)
+
+            try:
+                messages_top = int(messages.virtual_region.y)
+            except Exception:
+                messages_top = 0
+
+            messages.set_viewport(
+                relative_scroll_y=int(chat.scroll_y) - messages_top,
+                viewport_height=int(chat.size.height),
+            )
         except Exception:
             pass
 
