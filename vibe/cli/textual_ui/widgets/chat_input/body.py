@@ -9,11 +9,28 @@ from textual.containers import Horizontal
 from textual.message import Message
 from textual.widget import Widget
 from textual.widgets import Static
+from textual.worker import Worker, WorkerState
 
 from vibe.cli.history_manager import HistoryManager
+from vibe.cli.textual_ui.widgets.chat_input.mic_button import MicButton
 from vibe.cli.textual_ui.widgets.chat_input.text_area import ChatTextArea, InputMode
 from vibe.cli.textual_ui.widgets.no_markup_static import NoMarkupStatic
 from vibe.cli.textual_ui.widgets.spinner import SpinnerMixin, SpinnerType
+from vibe.core.logger import logger
+
+# Lazy-loaded at first use so the app still starts if no mic is available
+_recorder_available: bool | None = None
+
+
+def _check_recorder() -> bool:
+    global _recorder_available  # noqa: PLW0603
+    if _recorder_available is None:
+        try:
+            import sounddevice  # noqa: F401
+            _recorder_available = True
+        except (ImportError, OSError):
+            _recorder_available = False
+    return _recorder_available
 
 
 class _PromptSpinner(SpinnerMixin, Static):
@@ -63,6 +80,10 @@ class ChatInputBody(Widget):
                 id="input", nuage_enabled=self._nuage_enabled
             )
             yield self.input_widget
+
+            if _check_recorder():
+                self._mic_button = MicButton(id="mic-button")
+                yield self._mic_button
 
     def on_mount(self) -> None:
         if self.input_widget:
@@ -182,17 +203,19 @@ class ChatInputBody(Widget):
             return
 
         value = event.value.strip()
-        if value:
-            if self.history:
-                self.history.add(value)
-                self.history.reset_navigation()
+        if not value:
+            return
 
-            self.input_widget.clear_text()
-            self._update_prompt()
+        if self.history:
+            self.history.add(value)
+            self.history.reset_navigation()
 
-            self._notify_completion_reset()
+        self.input_widget.clear_text()
+        self._update_prompt()
 
-            self.post_message(self.Submitted(value))
+        self._notify_completion_reset()
+
+        self.post_message(self.Submitted(value))
 
     @property
     def switching_mode(self) -> bool:
@@ -250,3 +273,116 @@ class ChatInputBody(Widget):
 
         if cursor_offset is not None:
             self.input_widget.set_cursor_offset(max(0, min(cursor_offset, len(text))))
+
+    # ------------------------------------------------------------------
+    # Voice recording / transcription
+    # ------------------------------------------------------------------
+
+    def on_button_pressed(self, event: MicButton.Pressed) -> None:
+        """Handle mic button presses to toggle recording."""
+        if not isinstance(event.button, MicButton):
+            return
+        event.stop()
+        self._toggle_recording()
+
+    def _toggle_recording(self) -> None:
+        """Start or stop audio recording."""
+        if not hasattr(self, "_mic_button"):
+            self.notify("Audio recording is not available", severity="error")
+            return
+
+        if self._mic_button.is_transcribing:
+            return  # transcription in flight, ignore clicks
+
+        if self._mic_button.is_recording:
+            self._stop_recording()
+        else:
+            self._start_recording()
+
+    def _start_recording(self) -> None:
+        from vibe.core.voice.recorder import AudioRecorder
+
+        if not hasattr(self, "_recorder"):
+            self._recorder = AudioRecorder()
+
+        try:
+            self._recorder.start()
+        except Exception as exc:
+            logger.warning("Failed to start recording: %s", exc)
+            self.notify(f"Cannot record: {exc}", severity="error")
+            return
+
+        self._mic_button.set_recording()
+
+        # Mount live waveform, hide text input
+        if self.prompt_widget:
+            self.prompt_widget.display = False
+        if self.input_widget:
+            self.input_widget.display = False
+
+        from vibe.cli.textual_ui.widgets.chat_input.waveform import VoiceWaveform
+
+        waveform = VoiceWaveform(self._recorder, id="voice-waveform")
+        self.query_one(Horizontal).mount(waveform, after=0)
+
+    def _remove_waveform(self) -> None:
+        """Remove the live waveform and restore the text input."""
+        from vibe.cli.textual_ui.widgets.chat_input.waveform import VoiceWaveform
+
+        for w in self.query(VoiceWaveform):
+            w.remove()
+        if self.prompt_widget:
+            self.prompt_widget.display = True
+        if self.input_widget:
+            self.input_widget.display = True
+
+    def _stop_recording(self) -> None:
+        self._remove_waveform()
+
+        try:
+            wav_bytes = self._recorder.stop()
+        except ValueError as exc:
+            # recording too short
+            self._mic_button.set_idle()
+            self.notify(str(exc), severity="warning")
+            return
+        except Exception as exc:
+            self._mic_button.set_idle()
+            logger.warning("Recording error: %s", exc)
+            self.notify(f"Recording failed: {exc}", severity="error")
+            return
+
+        self._mic_button.set_transcribing()
+        self.notify("Transcribing…")
+        self.run_worker(self._transcribe(wav_bytes), name="voice-transcribe", exclusive=True)
+
+    async def _transcribe(self, wav_bytes: bytes) -> str:
+        from vibe.core.voice.transcriber import transcribe_audio
+
+        return await transcribe_audio(wav_bytes)
+
+    def on_worker_state_changed(self, event: Worker.StateChanged) -> None:
+        """Handle the result of the transcription worker."""
+        if event.worker.name != "voice-transcribe":
+            return
+
+        match event.state:
+            case WorkerState.SUCCESS:
+                text = event.worker.result
+                if text and self.input_widget:
+                    self.input_widget.load_text(text)
+                    self.input_widget.focus()
+                    self.notify("Transcription ready – review and press Enter to send")
+                if hasattr(self, "_mic_button"):
+                    self._mic_button.set_idle()
+
+            case WorkerState.ERROR:
+                error = event.worker.error
+                logger.warning("Transcription failed: %s", error)
+                self.notify(f"Transcription failed: {error}", severity="error")
+                if hasattr(self, "_mic_button"):
+                    self._mic_button.set_idle()
+
+            case WorkerState.CANCELLED:
+                if hasattr(self, "_mic_button"):
+                    self._mic_button.set_idle()

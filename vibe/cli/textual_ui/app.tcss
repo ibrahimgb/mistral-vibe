@@ -116,6 +116,10 @@ TextArea > .text-area--cursor {
 
 #input-body {
     height: auto;
+
+    Horizontal {
+        align-vertical: middle;
+    }
 }
 
 #prompt,
@@ -137,6 +141,43 @@ TextArea > .text-area--cursor {
     border: none;
     padding: 0;
     scrollbar-visibility: hidden;
+}
+
+#mic-button {
+    width: 5;
+    height: 3;
+    min-width: 5;
+    background: transparent;
+    border: round #444;
+    color: #888;
+    padding: 0;
+    margin: 0;
+    content-align: center middle;
+    text-style: none;
+
+    &:hover {
+        color: ansi_white;
+    }
+
+    &.recording {
+        color: ansi_red;
+        border: round ansi_red;
+    }
+
+    &.transcribing {
+        color: ansi_yellow;
+        background: #2a2a2a;
+        border: round ansi_yellow;
+    }
+}
+
+#voice-waveform {
+    width: 1fr;
+    height: 7;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    content-align: center middle;
 }
 
 ToastRack {

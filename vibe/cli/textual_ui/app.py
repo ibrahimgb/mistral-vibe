@@ -209,6 +209,7 @@ class VibeApp(App):  # noqa: PLR0904
         Binding(
             "shift+down", "scroll_chat_down", "Scroll Down", show=False, priority=True
         ),
+        Binding("ctrl+r", "toggle_recording", "Record", show=False, priority=True),
     ]
 
     def __init__(
@@ -1439,6 +1440,16 @@ class VibeApp(App):  # noqa: PLR0904
             chat.scroll_relative(y=5, animate=False)
         except Exception:
             pass
+
+    def action_toggle_recording(self) -> None:
+        """Toggle voice recording via the mic button (Ctrl+R)."""
+        from vibe.cli.textual_ui.widgets.chat_input.body import ChatInputBody
+
+        try:
+            body = self.query_one(ChatInputBody)
+            body._toggle_recording()
+        except Exception:
+            self.notify("Audio recording is not available", severity="error")
 
     async def _show_dangerous_directory_warning(self) -> None:
         is_dangerous, reason = is_dangerous_directory()
