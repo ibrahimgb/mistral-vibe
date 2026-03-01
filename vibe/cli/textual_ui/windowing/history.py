@@ -44,7 +44,9 @@ def build_history_widgets(
         match msg.role:
             case Role.user:
                 if msg.content:
-                    widget = UserMessage(msg.content)
+                    widget = UserMessage(
+                        msg.content, message_id=msg.message_id
+                    )
                     widgets.append(widget)
                     history_widget_indices[widget] = history_index
 

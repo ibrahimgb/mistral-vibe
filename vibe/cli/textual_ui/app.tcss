@@ -256,6 +256,52 @@ Markdown {
     color: $mistral_orange;
 }
 
+.msg-action-toggle {
+    width: 3;
+    min-width: 3;
+    height: 1;
+    border: none;
+    background: transparent;
+    color: $text-muted;
+    margin: 0;
+    padding: 0;
+}
+
+.msg-action-toggle:hover {
+    color: $mistral_orange;
+}
+
+.msg-action-menu {
+    display: none;
+    width: auto;
+    height: auto;
+    padding-left: 2;
+}
+
+.msg-action-menu.visible {
+    display: block;
+}
+
+.msg-action-edit,
+.msg-action-delete {
+    width: auto;
+    min-width: 8;
+    height: 1;
+    border: none;
+    background: transparent;
+    color: $text-muted;
+    margin: 0 1 0 0;
+    padding: 0;
+}
+
+.msg-action-edit:hover {
+    color: $mistral_orange;
+}
+
+.msg-action-delete:hover {
+    color: ansi_red;
+}
+
 .assistant-message {
     layout: stream;
     margin-top: 1;

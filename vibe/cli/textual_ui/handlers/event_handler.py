@@ -27,10 +27,14 @@ if TYPE_CHECKING:
 
 class EventHandler:
     def __init__(
-        self, mount_callback: Callable, get_tools_collapsed: Callable[[], bool]
+        self,
+        mount_callback: Callable,
+        get_tools_collapsed: Callable[[], bool],
+        on_user_message_id: Callable[[str], None] | None = None,
     ) -> None:
         self.mount_callback = mount_callback
         self.get_tools_collapsed = get_tools_collapsed
+        self._on_user_message_id = on_user_message_id
         self.tool_calls: dict[str, ToolCallMessage] = {}
         self.current_compact: CompactMessage | None = None
         self.current_streaming_message: AssistantMessage | None = None
@@ -64,6 +68,8 @@ class EventHandler:
                 await self._handle_compact_end(event)
             case UserMessageEvent():
                 await self.finalize_streaming()
+                if self._on_user_message_id:
+                    self._on_user_message_id(event.message_id)
             case _:
                 await self.finalize_streaming()
                 await self._handle_unknown_event(event)

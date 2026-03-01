@@ -202,6 +202,53 @@ class SessionLogger:
                 f"Failed to persist session messages to {messages_filepath}: {e}"
             ) from e
 
+    async def rewrite_messages(self, messages: Sequence[LLMMessage]) -> None:
+        """Atomically rewrite messages.jsonl and update metadata total_messages."""
+        if not self.enabled or self.session_dir is None:
+            return
+
+        non_system = [m for m in messages if m.role != Role.system]
+        data = [m.model_dump(exclude_none=True) for m in non_system]
+
+        messages_filepath = self.session_dir / MESSAGES_FILENAME
+        temp_path: Path | None = None
+        try:
+            async with NamedTemporaryFile(
+                mode="w",
+                suffix=".jsonl.tmp",
+                dir=str(self.session_dir),
+                delete=False,
+                encoding="utf-8",
+            ) as f:
+                temp_path = Path(str(f.name))
+                for msg in data:
+                    await f.write(json.dumps(msg, ensure_ascii=False) + "\n")
+                await f.flush()
+                os.fsync(f.wrapped.fileno())
+
+            os.replace(temp_path, str(messages_filepath))
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to rewrite session messages to {messages_filepath}: {e}"
+            ) from e
+        finally:
+            if temp_path and temp_path.exists() and temp_path.is_file():
+                temp_path.unlink(missing_ok=True)
+
+        # Update total_messages in metadata
+        if self.session_metadata and self.metadata_filepath.exists():
+            try:
+                async with await AsyncPath(self.metadata_filepath).open(
+                    encoding="utf-8", errors="ignore"
+                ) as f:
+                    metadata = json.loads(await f.read())
+                metadata["total_messages"] = len(non_system)
+                await SessionLogger.persist_metadata(metadata, self.session_dir)
+            except Exception as e:
+                raise RuntimeError(
+                    f"Failed to update metadata after rewrite: {e}"
+                ) from e
+
     async def save_interaction(
         self,
         messages: Sequence[LLMMessage],

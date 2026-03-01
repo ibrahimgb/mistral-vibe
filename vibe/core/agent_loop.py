@@ -964,6 +964,11 @@ class AgentLoop:
         self.tool_manager.reset_all()
         self._reset_session()
 
+    async def remove_message_pair(self, message_id: str) -> None:
+        """Remove a user message and its direct LLM response, then persist."""
+        self.messages.remove_pair(message_id)
+        await self.session_logger.rewrite_messages(self.messages)
+
     async def compact(self) -> str:
         try:
             self._clean_message_history()

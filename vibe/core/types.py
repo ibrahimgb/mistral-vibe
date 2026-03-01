@@ -477,6 +477,27 @@ class MessageList(Sequence[LLMMessage]):
     def __bool__(self) -> bool:
         return bool(self._data)
 
+    def remove_pair(self, message_id: str) -> None:
+        """Remove a user message and its direct LLM response (until the next user message).
+
+        Raises:
+            ValueError: If no user message with the given message_id is found.
+        """
+        idx: int | None = None
+        for i, msg in enumerate(self._data):
+            if msg.role == Role.user and msg.message_id == message_id:
+                idx = i
+                break
+        if idx is None:
+            raise ValueError(f"No user message with message_id={message_id!r}")
+
+        # Collect the user message + all following non-user messages (assistant, tool, etc.)
+        end = idx + 1
+        while end < len(self._data) and self._data[end].role != Role.user:
+            end += 1
+
+        del self._data[idx:end]
+
 
 class RateLimitError(Exception):
     def __init__(self, provider: str, model: str) -> None:

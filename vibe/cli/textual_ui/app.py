@@ -210,6 +210,7 @@ class VibeApp(App):  # noqa: PLR0904
             "shift+down", "scroll_chat_down", "Scroll Down", show=False, priority=True
         ),
         Binding("ctrl+r", "toggle_recording", "Record", show=False, priority=True),
+        Binding("ctrl+up", "edit_last_message", "Edit Last", show=False),
     ]
 
     def __init__(
@@ -309,10 +310,12 @@ class VibeApp(App):  # noqa: PLR0904
         self._cached_messages_area = self.query_one("#messages")
         self._cached_chat = self.query_one("#chat", ChatScroll)
         self._cached_loading_area = self.query_one("#loading-area-content")
+        self._last_mounted_user_message: UserMessage | None = None
 
         self.event_handler = EventHandler(
             mount_callback=self._mount_and_scroll,
             get_tools_collapsed=lambda: self._tools_collapsed,
+            on_user_message_id=self._patch_user_message_id,
         )
 
         self._chat_input_container = self.query_one(ChatInputContainer)
@@ -593,6 +596,7 @@ class VibeApp(App):  # noqa: PLR0904
 
     async def _handle_user_message(self, message: str) -> None:
         user_message = UserMessage(message)
+        self._last_mounted_user_message = user_message
 
         await self._mount_and_scroll(user_message)
 
@@ -600,6 +604,11 @@ class VibeApp(App):  # noqa: PLR0904
             self._agent_task = asyncio.create_task(
                 self._handle_agent_loop_turn(message)
             )
+
+    def _patch_user_message_id(self, message_id: str) -> None:
+        if self._last_mounted_user_message is not None:
+            self._last_mounted_user_message.message_id = message_id
+            self._last_mounted_user_message = None
 
     def _reset_ui_state(self) -> None:
         self._windowing.reset()
@@ -1060,6 +1069,62 @@ class VibeApp(App):  # noqa: PLR0904
                     f"Failed to clear history: {e}", collapsed=self._tools_collapsed
                 )
             )
+
+    # ── Message edit / delete ────────────────────────────────────────
+
+    async def _remove_message_pair_from_ui(self, message_id: str) -> None:
+        """Remove a UserMessage widget and its following response widgets from the UI."""
+        messages_area = self._cached_messages_area or self.query_one("#messages")
+        children = list(messages_area.children)
+
+        source: UserMessage | None = None
+        source_idx: int | None = None
+        for i, child in enumerate(children):
+            if isinstance(child, UserMessage) and child.message_id == message_id:
+                source = child
+                source_idx = i
+                break
+
+        if source is None or source_idx is None:
+            return
+
+        to_remove: list[Widget] = [source]
+        for sibling in children[source_idx + 1 :]:
+            if isinstance(sibling, UserMessage):
+                break
+            to_remove.append(sibling)
+
+        await messages_area.remove_children(to_remove)
+
+    async def on_user_message_edit_requested(
+        self, event: UserMessage.EditRequested
+    ) -> None:
+        if self._agent_running:
+            return
+        if self._chat_input_container:
+            self._chat_input_container.value = event.content
+            self._chat_input_container.focus_input()
+        await self._remove_message_pair_from_ui(event.message_id)
+        await self.agent_loop.remove_message_pair(event.message_id)
+
+    async def on_user_message_delete_requested(
+        self, event: UserMessage.DeleteRequested
+    ) -> None:
+        if self._agent_running:
+            return
+        await self._remove_message_pair_from_ui(event.message_id)
+        await self.agent_loop.remove_message_pair(event.message_id)
+
+    async def action_edit_last_message(self) -> None:
+        if self._agent_running:
+            return
+        messages_area = self._cached_messages_area or self.query_one("#messages")
+        for child in reversed(list(messages_area.children)):
+            if isinstance(child, UserMessage) and child.message_id is not None:
+                child.post_message(
+                    UserMessage.EditRequested(child.message_id, child._content)
+                )
+                return
 
     async def _show_log_path(self) -> None:
         if not self.agent_loop.session_logger.enabled:

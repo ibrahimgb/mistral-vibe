@@ -4,7 +4,8 @@ from typing import Any
 
 from textual.app import ComposeResult
 from textual.containers import Horizontal, Vertical
-from textual.widgets import Static
+from textual.message import Message
+from textual.widgets import Button, Static
 from textual.widgets._markdown import MarkdownStream
 
 from vibe.cli.textual_ui.ansi_markdown import AnsiMarkdown as Markdown
@@ -35,17 +36,51 @@ class ExpandingBorder(NonSelectableStatic):
 
 
 class UserMessage(Static):
-    def __init__(self, content: str, pending: bool = False) -> None:
+    class EditRequested(Message):
+        def __init__(self, message_id: str, content: str) -> None:
+            super().__init__()
+            self.message_id = message_id
+            self.content = content
+
+    class DeleteRequested(Message):
+        def __init__(self, message_id: str) -> None:
+            super().__init__()
+            self.message_id = message_id
+
+    def __init__(
+        self, content: str, pending: bool = False, message_id: str | None = None
+    ) -> None:
         super().__init__()
         self.add_class("user-message")
         self._content = content
         self._pending = pending
+        self.message_id = message_id
 
     def compose(self) -> ComposeResult:
         with Horizontal(classes="user-message-container"):
             yield NoMarkupStatic(self._content, classes="user-message-content")
-            if self._pending:
-                self.add_class("pending")
+            yield Button("\u22ee", classes="msg-action-toggle", variant="default")
+        yield Horizontal(
+            Button("Edit", classes="msg-action-edit", variant="default"),
+            Button("Delete", classes="msg-action-delete", variant="default"),
+            classes="msg-action-menu",
+        )
+        if self._pending:
+            self.add_class("pending")
+
+    def on_button_pressed(self, event: Button.Pressed) -> None:
+        event.stop()
+        button = event.button
+        if button.has_class("msg-action-toggle"):
+            menu = self.query_one(".msg-action-menu")
+            menu.toggle_class("visible")
+            return
+        if self.message_id is None:
+            return
+        if button.has_class("msg-action-edit"):
+            self.post_message(self.EditRequested(self.message_id, self._content))
+        elif button.has_class("msg-action-delete"):
+            self.post_message(self.DeleteRequested(self.message_id))
 
     async def set_pending(self, pending: bool) -> None:
         if pending == self._pending:
