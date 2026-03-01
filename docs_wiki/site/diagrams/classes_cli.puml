@@ -1,0 +1,303 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — cli"
+
+class "VibeApp" {
+  +ENABLE_COMMAND_PALETTE
+  +CSS_PATH
+  +BINDINGS
+  +__init__()
+  +config()
+  +compose()
+  +on_mount()
+  +on_chat_input_container_submitted()
+  +on_approval_app_approval_granted()
+  +on_approval_app_approval_granted_always_tool()
+  +on_approval_app_approval_rejected()
+  .. +82 more ..
+}
+
+class "QuestionApp" {
+  +MAX_OPTIONS
+  +can_focus
+  +can_focus_children
+  +current_question_idx
+  +selected_option
+  +__init__()
+  +compose()
+  +on_mount()
+  +action_move_up()
+  +action_move_down()
+  +action_next_question()
+  +action_prev_question()
+  +action_select()
+  .. +38 more ..
+}
+
+class "ChatTextArea" {
+  +BINDINGS
+  +DEFAULT_MODE
+  +__init__()
+  +on_blur()
+  +set_app_focus()
+  +on_click()
+  +action_insert_newline()
+  +action_open_external_editor()
+  +on_text_area_changed()
+  +set_completion_manager()
+  .. +19 more ..
+}
+
+class "ChatInputBody" {
+  +__init__()
+  +compose()
+  +on_mount()
+  +on_chat_text_area_mode_changed()
+  +on_chat_text_area_history_previous()
+  +on_chat_text_area_history_next()
+  +on_chat_text_area_history_reset()
+  +on_chat_text_area_submitted()
+  .. +18 more ..
+}
+
+class "ChatInputContainer" {
+  +ID_INPUT_BOX
+  +__init__()
+  +compose()
+  +on_mount()
+  +input_widget()
+  +value()
+  +value()
+  +focus_input()
+  +render_completion_suggestions()
+  .. +9 more ..
+}
+
+class "LoadingWidget" {
+  +TARGET_COLORS
+  +SPINNER_TYPE
+  +EASTER_EGGS
+  +EASTER_EGGS_HALLOWEEN
+  +EASTER_EGGS_DECEMBER
+  +__init__()
+  +pause_timer()
+  +resume_timer()
+  +set_status()
+  +compose()
+  +on_mount()
+  +on_resize()
+  .. +7 more ..
+}
+
+class "EventHandler" {
+  +__init__()
+  +handle_event()
+  +finalize_streaming()
+  +stop_current_tool_call()
+  +stop_current_compact()
+  .. +6 more ..
+}
+
+class "ApprovalApp" {
+  +can_focus
+  +can_focus_children
+  +BINDINGS
+  +__init__()
+  +compose()
+  +on_mount()
+  +action_move_up()
+  +action_move_down()
+  +action_select()
+  +action_select_1()
+  +action_select_2()
+  .. +6 more ..
+}
+
+class "ConfigApp" {
+  +can_focus
+  +can_focus_children
+  +BINDINGS
+  +__init__()
+  +compose()
+  +on_mount()
+  +action_move_up()
+  +action_move_down()
+  +action_toggle_setting()
+  +action_cycle()
+  +action_close()
+  .. +4 more ..
+}
+
+class "ProxySetupApp" {
+  +can_focus
+  +can_focus_children
+  +BINDINGS
+  +__init__()
+  +compose()
+  +focus()
+  +action_focus_next()
+  +action_focus_previous()
+  +on_input_submitted()
+  +on_blur()
+  +on_input_blurred()
+  .. +3 more ..
+}
+
+class "PathCompletionController" {
+  +_executor
+  +__init__()
+  +can_handle()
+  +reset()
+  +on_text_changed()
+  +on_key()
+  .. +2 more ..
+}
+
+class "ToolCallMessage" {
+  +__init__()
+  +compose()
+  +on_mount()
+  +tool_call_id()
+  +get_content()
+  +update_event()
+  +set_stream_message()
+  +stop_spinning()
+  .. +1 more ..
+}
+
+class "ToolResultMessage" {
+  +__init__()
+  +tool_name()
+  +compose()
+  +on_mount()
+  +set_collapsed()
+  +toggle_collapsed()
+  .. +1 more ..
+}
+
+class "StreamingMessageBase" {
+  +__init__()
+  +append_content()
+  +write_initial_content()
+  +stop_stream()
+  +is_stripped_content_empty()
+}
+
+class "ReasoningMessage" {
+  +SPINNER_TYPE
+  +SPINNING_TEXT
+  +COMPLETED_TEXT
+  +__init__()
+  +compose()
+  +on_mount()
+  +on_resize()
+  +on_click()
+  +set_collapsed()
+}
+
+class "SnakeSpinner" {
+  +MAP_WIDTH
+  +MAP_HEIGHT
+  +SNAKE_LENGTH
+  +__init__()
+  +current_direction()
+  +current_frame()
+  +next_frame()
+  +reset()
+}
+
+class "StatusMessage" {
+  +SPINNER_TYPE
+  +__init__()
+  +compose()
+  +on_mount()
+  +on_resize()
+  +update_display()
+  +get_content()
+  +stop_spinning()
+}
+
+class "SlashCommandController" {
+  +__init__()
+  +can_handle()
+  +reset()
+  +on_text_changed()
+  +on_key()
+}
+
+class "HistoryManager" {
+  +__init__()
+  +add()
+  +get_previous()
+  +get_next()
+  +reset_navigation()
+}
+
+class "TextualNotificationAdapter" {
+  +__init__()
+  +notify()
+  +on_focus()
+  +on_blur()
+  +restore()
+}
+
+class "Banner" {
+  +state
+  +__init__()
+  +compose()
+  +on_mount()
+  +watch_state()
+  +freeze_animation()
+  +set_state()
+}
+
+class "SessionWindowing" {
+  +__init__()
+  +remaining()
+  +has_backfill()
+  +reset()
+  +set_backfill()
+  +next_load_more_batch()
+  +recompute_backfill()
+}
+
+class "MicButton" {
+  +LABEL_IDLE
+  +LABEL_RECORDING
+  +LABEL_TRANSCRIBING
+  +__init__()
+  +is_recording()
+  +is_transcribing()
+  +set_recording()
+  +set_transcribing()
+  +set_idle()
+}
+
+class "HistoryLoadMoreMessage" {
+  +__init__()
+  +compose()
+  +set_enabled()
+  +set_remaining()
+  +on_button_pressed()
+}
+
+class "SpinnerMixin" {
+  +SPINNER_TYPE
+  +SPINNING_TEXT
+  +COMPLETED_TEXT
+  +_spinner
+  +_spinner_timer
+  +init_spinner()
+  +start_spinner_timer()
+  +refresh_spinner()
+  +stop_spinning()
+  +on_unmount()
+}
+
+"SpinnerMixin" <|-- "LoadingWidget"
+"StatusMessage" <|-- "ToolCallMessage"
+"SpinnerMixin" <|-- "ReasoningMessage"
+"StreamingMessageBase" <|-- "ReasoningMessage"
+"SpinnerMixin" <|-- "StatusMessage"
+@enduml

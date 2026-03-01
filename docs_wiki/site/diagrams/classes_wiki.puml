@@ -1,0 +1,106 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — wiki"
+
+class "FunctionNode" <<dataclass>> {
+  +name
+  +qualified_name
+  +lineno
+  +end_lineno
+  +docstring
+  +signature()
+}
+
+class "ClassNode" <<dataclass>> {
+  +name
+  +qualified_name
+  +lineno
+  +end_lineno
+  +docstring
+  +public_methods()
+  +private_methods()
+}
+
+class "ImportNode" <<dataclass>> {
+  +module
+  +names
+  +is_relative
+  +level
+}
+
+class "ModuleNode" <<dataclass>> {
+  +path
+  +relative_path
+  +dotted_name
+  +lineno_count
+  +docstring
+  +is_init()
+}
+
+class "SubsystemCluster" <<dataclass>> {
+  +name
+  +description
+  +modules
+  +total_lines()
+  +total_classes()
+  +total_functions()
+}
+
+class "DependencyInfo" <<dataclass>> {
+  +name
+  +version_spec
+  +category
+}
+
+class "ProjectModel" <<dataclass>> {
+  +project_name
+  +version
+  +python_requires
+  +root
+  +modules
+  +total_lines()
+  +all_classes()
+  +all_functions()
+  +module_by_dotted()
+}
+
+enum "PatternKind" <<Enum>> {
+  +PROTOCOL_ADAPTER
+  +TEMPLATE_METHOD
+  +FACTORY
+  +STRATEGY
+  +MIDDLEWARE_PIPELINE
+}
+
+class "PatternInstance" <<dataclass>> {
+  +kind
+  +title
+  +description
+  +files
+  +classes
+}
+
+class "TechChoice" <<dataclass>> {
+  +name
+  +version_spec
+  +category
+  +purpose
+  +rationale
+}
+
+class "ArchitectureKnowledge" <<dataclass>> {
+  +patterns
+  +tech_choices
+}
+
+class "WikiBuildResult" <<dataclass>> {
+  +output_dir
+  +pages_written
+  +diagrams_rendered
+  +diagrams_failed
+  +llm_files_written
+  +summary()
+}
+
+@enduml

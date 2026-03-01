@@ -1,0 +1,71 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — setup"
+
+class "OnboardingApp" {
+  +CSS_PATH
+  +on_mount()
+}
+
+class "OnboardingScreen" {
+  +NEXT_SCREEN
+  +action_next()
+  +action_cancel()
+}
+
+class "ApiKeyScreen" {
+  +BINDINGS
+  +NEXT_SCREEN
+  +__init__()
+  +compose()
+  +on_mount()
+  +on_input_changed()
+  +on_input_submitted()
+  +on_mouse_up()
+  .. +1 more ..
+}
+
+class "WelcomeScreen" {
+  +BINDINGS
+  +NEXT_SCREEN
+  +__init__()
+  +compose()
+  +on_mount()
+  +action_next()
+  .. +2 more ..
+}
+
+class "TrustDialogQuitException" {
+}
+
+class "TrustFolderDialog" {
+  +can_focus
+  +can_focus_children
+  +BINDINGS
+  +__init__()
+  +compose()
+  +on_mount()
+  +action_move_left()
+  +action_move_right()
+  +action_select()
+  +action_select_1()
+  +action_select_2()
+  .. +3 more ..
+}
+
+class "TrustFolderApp" {
+  +CSS_PATH
+  +BINDINGS
+  +__init__()
+  +on_mount()
+  +compose()
+  +action_quit_without_saving()
+  +on_trust_folder_dialog_trusted()
+  +on_trust_folder_dialog_untrusted()
+  +run_trust_dialog()
+}
+
+"OnboardingScreen" <|-- "ApiKeyScreen"
+"OnboardingScreen" <|-- "WelcomeScreen"
+@enduml

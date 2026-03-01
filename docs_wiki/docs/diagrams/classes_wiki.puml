@@ -1,0 +1,114 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — wiki"
+
+class "FunctionNode" <<dataclass>> {
+  +name
+  +qualified_name
+  +lineno
+  +end_lineno
+  +docstring
+  +signature()
+}
+
+class "ClassNode" <<dataclass>> {
+  +name
+  +qualified_name
+  +lineno
+  +end_lineno
+  +docstring
+  +public_methods()
+  +private_methods()
+}
+
+class "ImportNode" <<dataclass>> {
+  +module
+  +names
+  +is_relative
+  +level
+}
+
+class "ModuleNode" <<dataclass>> {
+  +path
+  +relative_path
+  +dotted_name
+  +lineno_count
+  +docstring
+  +is_init()
+}
+
+class "SubsystemCluster" <<dataclass>> {
+  +name
+  +description
+  +modules
+  +total_lines()
+  +total_classes()
+  +total_functions()
+}
+
+class "DependencyInfo" <<dataclass>> {
+  +name
+  +version_spec
+  +category
+}
+
+class "ProjectModel" <<dataclass>> {
+  +project_name
+  +version
+  +python_requires
+  +root
+  +modules
+  +total_lines()
+  +all_classes()
+  +all_functions()
+  +module_by_dotted()
+}
+
+enum "PatternKind" <<Enum>> {
+  +PROTOCOL_ADAPTER
+  +TEMPLATE_METHOD
+  +FACTORY
+  +MIDDLEWARE_PIPELINE
+  +OBSERVER_STREAMING
+}
+
+class "PatternInstance" <<dataclass>> {
+  +kind
+  +title
+  +description
+  +files
+  +classes
+}
+
+class "ArchitectureKnowledge" <<dataclass>> {
+  +patterns
+}
+
+class "WikiBuildState" <<Pydantic>> {
+  +commit_sha
+  +build_timestamp
+  +project_version
+  +modules_count
+  +diagram_hashes
+  +save()
+  {static} +load()
+  {static} +create()
+}
+
+enum "BuildMode" <<Enum>> {
+  +FULL
+  +INCREMENTAL
+  +SKIPPED
+}
+
+class "WikiBuildResult" <<dataclass>> {
+  +output_dir
+  +build_mode
+  +pages_written
+  +diagrams_rendered
+  +diagrams_cached
+  +summary()
+}
+
+@enduml

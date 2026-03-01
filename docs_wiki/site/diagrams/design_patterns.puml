@@ -1,0 +1,47 @@
+@startmindmap
+* Design Patterns
+** Protocol Adapter
+*** Protocol / Adapter — CompletionView
+*** Protocol / Adapter — UpdateCacheRepository
+*** Protocol / Adapter — UpdateGateway
+*** Protocol / Adapter — APIAdapter
+** Template Method
+*** Template Method — OutputFormatter
+*** Template Method — BaseTool
+*** Template Method — ToolUIData
+** Factory
+*** Factory — get_current_version()
+*** Factory — get_version_from_pyproject()
+*** Factory — get_latest_version()
+*** Factory — create_release_branch()
+*** Factory — get_commits_summary()
+*** Factory — get_changelog_entry()
+***_ +96 more
+** Middleware Pipeline
+*** Middleware — InjectBeforeMiddleware
+*** Middleware Pipeline — tests.test_middleware
+*** Middleware Pipeline — vibe.core.middleware
+** Observer Streaming
+*** Async Streaming — get_acp_agent_loop_process()
+*** Async Streaming — FakeBackend
+*** Async Streaming — FakeTool
+*** Async Streaming — SimpleTool
+*** Async Streaming — VibeAcpAgentLoop
+*** Async Streaming — Bash
+***_ +18 more
+** Autodiscovery
+*** Auto-Discovery — TestSkillManagerDiscovery
+*** Auto-Discovery — TestSkillManagerSearchPaths
+*** Auto-Discovery — HistoryManager
+*** Auto-Discovery — AgentManager
+*** Auto-Discovery — SkillManager
+*** Auto-Discovery — ToolManager
+** Config As Code
+*** Config-as-Code — ProjectContextConfig
+*** Config-as-Code — SessionLoggingConfig
+*** Config-as-Code — ProviderConfig
+*** Config-as-Code — ModelConfig
+*** Config-as-Code — VibeConfig
+*** Config-as-Code — GitRepoConfig
+***_ +14 more
+@endmindmap

@@ -1,0 +1,29 @@
+@startuml
+!theme plain
+title "C4 Context — mistral-vibe"
+
+actor "Developer" as dev
+rectangle "mistral-vibe v2.3.0" as vibe {
+  component "CLI / TUI" as cli
+  component "Agent Loop" as agent
+  component "Tool System" as tools
+}
+
+cloud "LLM Providers" as llm {
+  component "Mistral AI" as mistral
+  component "Anthropic" as anthropic
+  component "Vertex AI" as vertex
+}
+
+database "File System" as fs
+rectangle "MCP Servers" as mcp
+
+dev --> cli : commands & prompts
+cli --> agent : user messages
+agent --> llm : API calls
+agent --> tools : tool invocations
+tools --> fs : read/write files
+tools --> mcp : MCP protocol
+agent --> agent : conversation loop
+
+@enduml

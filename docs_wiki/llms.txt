@@ -1,0 +1,40 @@
+# mistral-vibe
+
+> mistral-vibe v2.3.0 is a terminal-based AI coding assistant built on Mistral AI.  It features an agent loop with tool use, multi-provider LLM backends, session persistence, and a rich TUI.
+
+## Entry Points
+
+- CLI: `vibe.cli.entrypoint:main`
+- ACP Server: `vibe.acp.entrypoint:main`
+- Agent Loop: `vibe.core.agent_loop:AgentLoop`
+- Config: `vibe.core.config:VibeConfig`
+- Tool System: `vibe.core.tools.manager:ToolManager`
+
+## Subsystems
+
+- **__init__.py** (1 modules, 0 classes, 7 lines): The __init__.py subsystem.
+- **acp** (13 modules, 19 classes, 1,993 lines): Agent Client Protocol — session management, ACP tools, and server integration.
+- **cli** (66 modules, 106 classes, 8,764 lines): Command-line interface, TUI, autocompletion, and user-facing commands.
+- **core** (58 modules, 158 classes, 9,690 lines): Core agent loop, configuration, LLM backends, middleware, and orchestration.
+- **scripts** (2 modules, 0 classes, 496 lines): The scripts subsystem.
+- **setup** (6 modules, 7 classes, 517 lines): Onboarding, first-run setup, and trusted-folder management.
+- **tests** (143 modules, 281 classes, 28,447 lines): The tests subsystem.
+- **tools** (21 modules, 86 classes, 3,982 lines): Built-in tool implementations, MCP integrations, and tool management.
+- **voice** (3 modules, 1 classes, 212 lines): Voice recording and transcription.
+- **wiki** (10 modules, 13 classes, 2,967 lines): Code wiki documentation generator (this system).
+
+## Design Patterns
+
+- Autodiscovery (4 instances)
+- Config As Code (20 instances)
+- Factory (16 instances)
+- Middleware Pipeline (1 instances)
+- Observer Streaming (20 instances)
+- Protocol Adapter (3 instances)
+- Template Method (3 instances)
+
+## Detailed Documentation
+
+- [llms-full.txt](llms-full.txt): Complete module/class/function reference
+- [symbol_index.json](symbol_index.json): Symbol → file:line mapping
+- [dependency_graph.json](dependency_graph.json): Module import adjacency list

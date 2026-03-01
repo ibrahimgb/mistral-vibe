@@ -1,0 +1,38 @@
+@startuml
+!theme plain
+title "Data Flow — Message Lifecycle"
+
+start
+
+:User types message;
+
+:VibeApp captures input;
+
+:Build system prompt\n+ conversation history;
+
+:Middleware pre-processing;
+
+:Send to LLM Backend;
+
+if (Response has tool calls?) then (yes)
+  :ToolManager dispatches\ntool invocations;
+
+  :Tools execute\n(bash, read_file, etc.);
+
+  :Tool results appended\nto conversation;
+
+  :Re-send to LLM;
+else (no)
+endif
+
+:Stream response tokens;
+
+:Middleware post-processing;
+
+:Render in TUI\n(Markdown → Rich);
+
+:Log to session file;
+
+stop
+
+@enduml

@@ -1,0 +1,89 @@
+@startuml
+!theme plain
+skinparam componentStyle rectangle
+skinparam linetype ortho
+
+title "Component Overview"
+
+package "__init__.py" as __init___py {
+  component "__init__" as vibe
+}
+
+package "acp" as acp {
+  component "acp_agent_loop" as vibe_acp_acp_agent_loop
+  component "utils" as vibe_acp_utils
+  component "bash" as vibe_acp_tools_builtins_bash
+}
+
+package "cli" as cli {
+  component "app" as vibe_cli_textual_ui_app
+  component "question_app" as vibe_cli_textual_ui_widgets_question_app
+  component "body" as vibe_cli_textual_ui_widgets_chat_input_body
+}
+
+package "core" as core {
+  component "agent_loop" as vibe_core_agent_loop
+  component "anthropic" as vibe_core_llm_backend_anthropic
+  component "config" as vibe_core_config
+}
+
+package "scripts" as scripts {
+  component "prepare_release" as scripts_prepare_release
+  component "bump_version" as scripts_bump_version
+}
+
+package "setup" as setup {
+  component "trust_folder_dialog" as vibe_setup_trusted_folders_trust_folder_dialog
+  component "api_key" as vibe_setup_onboarding_screens_api_key
+  component "welcome" as vibe_setup_onboarding_screens_welcome
+}
+
+package "tests" as tests {
+  component "test_acp" as tests_acp_test_acp
+  component "test_session_loader" as tests_session_test_session_loader
+  component "test_session_logger" as tests_session_test_session_logger
+}
+
+package "tools" as tools {
+  component "search_replace" as vibe_core_tools_builtins_search_replace
+  component "tools" as vibe_core_tools_mcp_tools
+  component "bash" as vibe_core_tools_builtins_bash
+}
+
+package "voice" as voice {
+  component "recorder" as vibe_core_voice_recorder
+  component "transcriber" as vibe_core_voice_transcriber
+  component "__init__" as vibe_core_voice
+}
+
+package "wiki" as wiki {
+  component "analyzer" as vibe_core_wiki_analyzer
+  component "narrative" as vibe_core_wiki_narrative
+  component "site_builder" as vibe_core_wiki_site_builder
+}
+
+tests --> acp
+tests --> core
+tests --> tools
+tests --> cli
+tests --> __init___py
+tests --> setup
+acp --> __init___py
+acp --> core
+acp --> tools
+acp --> setup
+cli --> core
+cli --> __init___py
+cli --> setup
+cli --> tools
+cli --> wiki
+cli --> voice
+core --> cli
+core --> tools
+core --> __init___py
+tools --> core
+tools --> wiki
+voice --> core
+setup --> core
+setup --> cli
+@enduml

@@ -1,0 +1,227 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — tools"
+
+class "SearchReplace" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +resolve_permission()
+  +run()
+  .. +7 more ..
+}
+
+abstract class "BaseTool" <<Abstract>> {
+  +description
+  +prompt_path
+  +__init__()
+  {abstract} +run()
+  {static} +get_tool_prompt()
+  +invoke()
+  {static} +from_config()
+  {static} +get_parameters()
+  {static} +get_name()
+  {static} +is_available()
+  .. +6 more ..
+}
+
+class "Grep" {
+  +description
+  +run()
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  .. +5 more ..
+}
+
+class "ToolManager" {
+  +__init__()
+  {static} +discover_tool_defaults()
+  +available_tools()
+  +get_tool_config()
+  +get()
+  +reset_all()
+  +invalidate_tool()
+  .. +4 more ..
+}
+
+class "ReadFile" {
+  +description
+  +run()
+  +resolve_permission()
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  .. +1 more ..
+}
+
+class "WebFetch" {
+  +description
+  +run()
+  {static} +get_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+}
+
+class "MCPRegistry" {
+  +__init__()
+  +get_tools()
+  +clear()
+}
+
+class "Bash" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +resolve_permission()
+  +run()
+}
+
+class "WikiDoc" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +run()
+}
+
+class "WriteFile" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +resolve_permission()
+  +run()
+}
+
+abstract class "ToolUIData" <<Abstract>> {
+  {static} +get_no_args_display()
+  {static} +get_invalid_args_display()
+  {static} +format_call_display()
+  {static} +get_call_display()
+  {abstract} {static} +get_result_display()
+  {abstract} {static} +get_status_text()
+}
+
+class "Todo" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +run()
+}
+
+class "WebSearch" {
+  +description
+  {static} +is_available()
+  +run()
+  {static} +get_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+}
+
+class "Task" {
+  +description
+  {static} +get_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +resolve_permission()
+  +run()
+}
+
+class "AskUserQuestion" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +run()
+}
+
+class "WikiDiagram" {
+  +description
+  {static} +format_call_display()
+  {static} +get_result_display()
+  {static} +get_status_text()
+  +run()
+}
+
+class "ToolUIDataAdapter" {
+  +__init__()
+  +get_call_display()
+  +get_result_display()
+  +get_status_text()
+}
+
+class "RemoteTool" <<Pydantic>> {
+  +model_config
+  +name
+  +description
+  +input_schema
+}
+
+class "MCPSamplingHandler" {
+  +__init__()
+  +__call__()
+}
+
+enum "ToolPermission" <<Enum>> {
+  +ALWAYS
+  +NEVER
+  +ASK
+  {static} +by_name()
+}
+
+class "_MCPResultIn" <<Pydantic>> {
+  +model_config
+  +structuredContent
+  +content
+}
+
+class "InvokeContext" <<dataclass>> {
+  +tool_call_id
+  +approval_callback
+  +agent_manager
+  +user_input_callback
+  +sampling_callback
+}
+
+class "ToolError" {
+}
+
+class "ToolInfo" <<Pydantic>> {
+  +name
+  +description
+  +parameters
+}
+
+class "ToolPermissionError" {
+}
+
+"BaseTool" <|-- "SearchReplace"
+"ToolUIData" <|-- "SearchReplace"
+"BaseTool" <|-- "Grep"
+"ToolUIData" <|-- "Grep"
+"BaseTool" <|-- "ReadFile"
+"ToolUIData" <|-- "ReadFile"
+"BaseTool" <|-- "WebFetch"
+"ToolUIData" <|-- "WebFetch"
+"BaseTool" <|-- "Bash"
+"ToolUIData" <|-- "Bash"
+"BaseTool" <|-- "WikiDoc"
+"ToolUIData" <|-- "WikiDoc"
+"BaseTool" <|-- "WriteFile"
+"ToolUIData" <|-- "WriteFile"
+"BaseTool" <|-- "Todo"
+"ToolUIData" <|-- "Todo"
+"BaseTool" <|-- "WebSearch"
+"ToolUIData" <|-- "WebSearch"
+"BaseTool" <|-- "Task"
+"ToolUIData" <|-- "Task"
+"BaseTool" <|-- "AskUserQuestion"
+"ToolUIData" <|-- "AskUserQuestion"
+"BaseTool" <|-- "WikiDiagram"
+"ToolUIData" <|-- "WikiDiagram"
+@enduml

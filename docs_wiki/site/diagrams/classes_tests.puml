@@ -1,0 +1,303 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — tests"
+
+class "TestReadOnlyAgentMiddleware" {
+  +test_injects_reminder_when_target_agent_active()
+  +test_does_not_inject_when_non_target_agent()
+  +test_injects_reminder_only_once()
+  +test_injects_exit_message_when_leaving()
+  +test_reinjects_reminder_on_reentry()
+  +test_custom_reminder()
+  +test_custom_exit_message()
+  +test_reset_clears_state()
+  .. +11 more ..
+}
+
+class "TestTrustedFoldersManager" {
+  +test_initializes_with_empty_lists_when_file_does_not_exist()
+  +test_loads_existing_file()
+  +test_handles_corrupted_file()
+  +test_normalizes_paths_to_absolute()
+  +test_expands_user_home_in_paths()
+  +test_is_trusted_returns_true_for_trusted_path()
+  +test_is_trusted_returns_false_for_untrusted_path()
+  +test_is_trusted_returns_none_for_unknown_path()
+  .. +10 more ..
+}
+
+class "FakeClient" {
+  +agent
+  +__init__()
+  +session_update()
+  +request_permission()
+  +read_text_file()
+  +write_text_file()
+  +create_terminal()
+  +terminal_output()
+  +release_terminal()
+  .. +8 more ..
+}
+
+class "TestStreamingEvents" {
+  +test_message_start()
+  +test_message_start_without_usage()
+  +test_content_block_start_tool_use()
+  +test_content_block_start_thinking()
+  +test_content_block_start_redacted_thinking()
+  +test_content_block_delta_text()
+  +test_content_block_delta_thinking()
+  +test_content_block_delta_input_json()
+  .. +7 more ..
+}
+
+class "TestQuestionAppState" {
+  +test_init_state()
+  +test_total_options_single_select()
+  +test_total_options_multi_select_includes_submit()
+  +test_is_other_selected()
+  +test_is_submit_selected()
+  +test_is_submit_selected_false_for_single_select()
+  +test_store_other_text_per_question()
+  +test_save_regular_option_answer()
+  .. +7 more ..
+}
+
+class "TestSkillMetadata" {
+  +test_creates_with_required_fields()
+  +test_creates_with_all_fields()
+  +test_raises_error_for_uppercase_name()
+  +test_raises_error_for_invalid_chars_in_name()
+  +test_raises_error_for_consecutive_hyphens()
+  +test_raises_error_for_leading_trailing_hyphens()
+  +test_parses_allowed_tools_from_space_delimited_string()
+  +test_parses_allowed_tools_from_list()
+  .. +6 more ..
+}
+
+class "TestMCPRegistry" {
+  +test_server_key_is_stable()
+  +test_different_configs_produce_different_keys()
+  +test_get_tools_caches_discovery()
+  +test_get_tools_returns_empty_for_no_servers()
+  +test_clear_drops_cache()
+  +test_cache_survives_multiple_get_tools_calls()
+  +test_disjoint_server_lists_across_agents()
+  +test_discover_http_success()
+  .. +6 more ..
+}
+
+class "TestAdapterPrepareRequest" {
+  +test_basic()
+  +test_beta_features()
+  +test_api_key_header()
+  +test_streaming()
+  +test_default_max_tokens()
+  +test_with_thinking()
+  +test_system_cached()
+  +test_with_tools()
+  .. +4 more ..
+}
+
+class "TestTelemetryClient" {
+  +test_send_telemetry_event_does_nothing_when_api_key_is_none()
+  +test_send_telemetry_event_does_nothing_when_disabled()
+  +test_send_telemetry_event_posts_when_enabled()
+  +test_send_tool_call_finished_payload_shape()
+  +test_send_tool_call_finished_nb_files_created_write_file_new()
+  +test_send_tool_call_finished_nb_files_modified_write_file_overwrite()
+  +test_send_tool_call_finished_decision_none()
+  +test_send_user_copied_text_payload()
+  .. +4 more ..
+}
+
+class "TestSessionLoaderFindLatestSession" {
+  +test_find_latest_session_no_sessions()
+  +test_find_latest_session_single_session()
+  +test_find_latest_session_multiple_sessions()
+  +test_find_latest_session_nonexistent_save_dir()
+  +test_find_latest_session_with_invalid_sessions()
+  +test_find_latest_session_with_mixed_valid_invalid()
+  +test_find_latest_session_with_invalid_json()
+  +test_find_latest_session_skips_empty_messages_file()
+  .. +4 more ..
+}
+
+class "TestTextualNotificationAdapter" {
+  +test_no_notification_when_disabled()
+  +test_no_notification_when_focused()
+  +test_notification_sent_when_unfocused_and_enabled()
+  +test_throttle_prevents_rapid_notifications()
+  +test_contextual_title_for_action_required()
+  +test_contextual_title_for_complete()
+  +test_restore_sets_default_title()
+  +test_on_focus_restores_title()
+  .. +3 more ..
+}
+
+class "TestParseProxyCommand" {
+  +test_parses_key_only()
+  +test_parses_key_and_value()
+  +test_uppercases_key()
+  +test_preserves_value_case()
+  +test_strips_leading_whitespace()
+  +test_strips_trailing_whitespace()
+  +test_splits_on_first_space_only()
+  +test_raises_error_for_empty_string()
+  .. +3 more ..
+}
+
+class "TestDeepMerge" {
+  +test_simple_merge()
+  +test_override_existing_key()
+  +test_nested_dict_merge()
+  +test_deeply_nested_merge()
+  +test_override_dict_with_non_dict()
+  +test_override_non_dict_with_dict()
+  +test_preserves_original_base()
+  +test_empty_override()
+  .. +3 more ..
+}
+
+class "TestACPSetModel" {
+  +test_set_model_success()
+  +test_set_model_invalid_model_returns_none()
+  +test_set_model_to_same_model()
+  +test_set_model_saves_to_config()
+  +test_set_model_does_not_save_on_invalid_model()
+  +test_set_model_with_empty_string()
+  +test_set_model_updates_active_model()
+  +test_set_model_calls_reload_with_initial_messages()
+  .. +2 more ..
+}
+
+class "TestFormatRelativeTime" {
+  +test_just_now()
+  +test_minutes_ago()
+  +test_hours_ago()
+  +test_days_ago()
+  +test_weeks_ago()
+  +test_none_returns_unknown()
+  +test_invalid_format_returns_unknown()
+  +test_handles_z_suffix()
+  .. +2 more ..
+}
+
+class "TestSetProxyVar" {
+  +test_sets_valid_proxy_var()
+  +test_sets_all_supported_vars()
+  +test_uppercases_key_before_validation()
+  +test_raises_error_for_unknown_key()
+  +test_error_message_contains_supported_keys()
+  +test_creates_env_file_if_missing()
+  +test_overwrites_existing_value()
+  +test_preserves_other_values()
+  .. +2 more ..
+}
+
+class "FakeBackend" {
+  +__init__()
+  +requests_messages()
+  +requests_extra_headers()
+  +requests_metadata()
+  +__aenter__()
+  +__aexit__()
+  +complete()
+  +complete_streaming()
+  .. +2 more ..
+}
+
+class "TestLoadSession" {
+  +test_load_session_response_structure()
+  +test_load_session_registers_session_with_original_id()
+  +test_load_session_injects_messages_into_agent_loop()
+  +test_load_session_replays_user_messages()
+  +test_load_session_replays_assistant_messages()
+  +test_load_session_replays_tool_calls()
+  +test_load_session_replays_reasoning_content()
+  +test_load_session_not_found_raises_error()
+  .. +1 more ..
+}
+
+class "TestHelperMethods" {
+  +test_has_thinking_content_true()
+  +test_has_thinking_content_false()
+  +test_has_thinking_content_empty()
+  +test_has_thinking_content_non_list_content()
+  +test_add_cache_control_to_last_user_message()
+  +test_add_cache_control_skips_non_user()
+  +test_add_cache_control_skips_string_content()
+  +test_add_cache_control_tool_result()
+  .. +1 more ..
+}
+
+class "TestGnuGrepBackend" {
+  +test_finds_pattern_in_file()
+  +test_finds_multiple_matches()
+  +test_returns_empty_on_no_matches()
+  +test_case_insensitive_for_lowercase_pattern()
+  +test_case_sensitive_for_mixed_case_pattern()
+  +test_respects_exclude_patterns()
+  +test_searches_in_specific_path()
+  +test_respects_vibeignore_file()
+  .. +1 more ..
+}
+
+class "TestMCPConfigModels" {
+  +test_mcp_base_default_timeouts()
+  +test_mcp_base_custom_timeouts()
+  +test_mcp_base_rejects_non_positive_timeout()
+  +test_mcp_stdio_with_env()
+  +test_mcp_stdio_argv_with_string_command()
+  +test_mcp_stdio_argv_with_list_command()
+  +test_mcp_http_default_timeouts()
+  +test_mcp_streamable_http_default_timeouts()
+  .. +1 more ..
+}
+
+class "TestListSessions" {
+  +test_list_sessions_empty()
+  +test_list_sessions_returns_all_sessions()
+  +test_list_sessions_filters_by_cwd()
+  +test_list_sessions_sorted_by_updated_at()
+  +test_list_sessions_includes_session_info_fields()
+  +test_list_sessions_skips_invalid_sessions()
+  +test_list_sessions_nonexistent_save_dir()
+  +test_list_sessions_without_api_key()
+}
+
+class "TestACPSetMode" {
+  +test_set_mode_to_default()
+  +test_set_mode_to_auto_approve()
+  +test_set_mode_to_plan()
+  +test_set_mode_to_accept_edits()
+  +test_set_mode_to_chat()
+  +test_set_mode_invalid_mode_returns_none()
+  +test_set_mode_to_same_mode()
+  +test_set_mode_with_empty_string()
+}
+
+class "TestMapperPrepareMessages" {
+  +test_system_extracted()
+  +test_user_message()
+  +test_assistant_text()
+  +test_assistant_with_reasoning_content_and_signature()
+  +test_assistant_with_reasoning_content()
+  +test_assistant_with_tool_calls()
+  +test_tool_result_appended_to_user()
+  +test_tool_result_new_user_when_no_prior()
+}
+
+class "TestMapperStreamingEvents" {
+  +test_text_delta()
+  +test_thinking_delta()
+  +test_tool_use_start()
+  +test_input_json_delta()
+  +test_message_start_usage()
+  +test_message_delta_usage()
+  +test_unknown_event()
+  +test_signature_delta()
+}
+
+@enduml

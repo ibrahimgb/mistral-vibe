@@ -86,8 +86,16 @@ class VoiceWaveform(Static):
     the centre row.
     """
 
-    def __init__(self, recorder: AudioRecorder, **kwargs: object) -> None:
-        super().__init__("", **kwargs)
+    def __init__(
+        self,
+        recorder: AudioRecorder,
+        *,
+        name: str | None = None,
+        id: str | None = None,
+        classes: str | None = None,
+        disabled: bool = False,
+    ) -> None:
+        super().__init__("", name=name, id=id, classes=classes, disabled=disabled)
         self._recorder = recorder
         self._start_time = time.monotonic()
         self._dot_visible = True

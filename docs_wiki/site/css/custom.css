@@ -1,0 +1,22 @@
+/* Code Wiki custom styles */
+img[alt*="diagram"], img[alt*="overview"], img[alt*="flow"],
+img[alt*="context"], img[alt*="stack"], img[alt*="pattern"],
+img[alt*="classes_"], img[alt*="mindmap"], img[alt*="component"],
+img[alt*="sequence"], img[alt*="tech"] {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1em auto;
+  border: 1px solid var(--md-default-fg-color--lightest);
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--md-default-bg-color);
+}
+
+.md-typeset table {
+  font-size: 0.85em;
+}
+
+.md-typeset h3 code {
+  font-size: 0.9em;
+}

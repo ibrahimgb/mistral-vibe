@@ -874,6 +874,29 @@ class VibeApp(App):  # noqa: PLR0904
         help_text = self.commands.get_help_text()
         await self._mount_and_scroll(UserCommandMessage(help_text))
 
+    async def _wiki_command(self) -> None:
+        """Build the Code Wiki and display a summary."""
+        await self._mount_and_scroll(
+            UserCommandMessage("Building Code Wiki… this may take a moment.")
+        )
+        try:
+            from vibe.core.wiki.site_builder import build_wiki_site
+
+            result = await build_wiki_site(".")
+            summary = (
+                f"## Code Wiki Built\n\n"
+                f"{result.summary}\n\n"
+                f"### Next Steps\n\n"
+                f"- **Serve locally:** `cd {result.output_dir} && uv run mkdocs serve`\n"
+                f"- **Build static site:** `cd {result.output_dir} && uv run mkdocs build`\n"
+                f"- **LLM docs:** `{result.output_dir}/llms.txt`\n"
+            )
+            await self._mount_and_scroll(UserCommandMessage(summary))
+        except Exception as exc:
+            await self._mount_and_scroll(
+                ErrorMessage(f"Wiki build failed: {exc}", collapsed=self._tools_collapsed)
+            )
+
     async def _show_status(self) -> None:
         stats = self.agent_loop.stats
         status_text = f"""## Agent Statistics

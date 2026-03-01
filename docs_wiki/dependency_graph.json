@@ -1,0 +1,1537 @@
+{
+  "tests.acp.conftest": [
+    "tests.stubs.fake_backend",
+    "tests.stubs.fake_client",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_acp": [
+    "tests",
+    "tests.conftest",
+    "tests.mock.utils",
+    "vibe.acp.utils",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_agent_thought": [
+    "tests.acp.conftest",
+    "tests.conftest",
+    "tests.stubs.fake_backend",
+    "tests.stubs.fake_client",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_bash": [
+    "tests.mock.utils",
+    "vibe.acp.tools.builtins.bash",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.bash"
+  ],
+  "tests.acp.test_compact_session_updates": [
+    "tests.conftest",
+    "tests.stubs.fake_backend",
+    "tests.stubs.fake_client",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop"
+  ],
+  "tests.acp.test_content": [
+    "tests.stubs.fake_backend",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_initialize": [
+    "vibe.acp.acp_agent_loop"
+  ],
+  "tests.acp.test_list_sessions": [
+    "tests.acp.conftest",
+    "vibe.core.config"
+  ],
+  "tests.acp.test_load_session": [
+    "tests.conftest",
+    "tests.stubs.fake_backend",
+    "tests.stubs.fake_client",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_multi_session": [
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_new_session": [
+    "tests.acp.conftest",
+    "tests.conftest",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config"
+  ],
+  "tests.acp.test_proxy_setup_acp": [
+    "tests.acp.conftest",
+    "tests.conftest",
+    "tests.stubs.fake_client",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop"
+  ],
+  "tests.acp.test_read_file": [
+    "tests.mock.utils",
+    "vibe.acp.tools.builtins.read_file",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.read_file"
+  ],
+  "tests.acp.test_search_replace": [
+    "tests.mock.utils",
+    "vibe.acp.tools.builtins.search_replace",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.search_replace",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_set_config_option": [
+    "tests.acp.conftest",
+    "tests.conftest",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config"
+  ],
+  "tests.acp.test_set_mode": [
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agents.models"
+  ],
+  "tests.acp.test_set_model": [
+    "tests.acp.conftest",
+    "tests.conftest",
+    "vibe.acp.acp_agent_loop",
+    "vibe.core.agent_loop",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_tool_call_session_update": [
+    "vibe.acp.tools.session_update",
+    "vibe.core.tools.builtins.read_file",
+    "vibe.core.types"
+  ],
+  "tests.acp.test_utils": [
+    "vibe.acp.utils",
+    "vibe.core.paths.global_paths",
+    "vibe.core.proxy_setup"
+  ],
+  "tests.acp.test_write_file": [
+    "tests.mock.utils",
+    "vibe.acp.tools.builtins.write_file",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.write_file",
+    "vibe.core.types",
+    "vibe.core.types"
+  ],
+  "tests.autocompletion.test_file_indexer": [
+    "vibe.core.autocompletion.file_indexer"
+  ],
+  "tests.autocompletion.test_fuzzy": [
+    "vibe.core.autocompletion.fuzzy"
+  ],
+  "tests.autocompletion.test_path_completer_fuzzy": [
+    "vibe.core.autocompletion.completers"
+  ],
+  "tests.autocompletion.test_path_completer_recursive": [
+    "vibe.core.autocompletion.completers"
+  ],
+  "tests.autocompletion.test_path_completion_controller": [
+    "vibe.cli.autocompletion.base",
+    "vibe.cli.autocompletion.path_completion",
+    "vibe.core.autocompletion.completers"
+  ],
+  "tests.autocompletion.test_path_prompt_transformer": [
+    "vibe.core.autocompletion.path_prompt_adapter"
+  ],
+  "tests.autocompletion.test_slash_command_controller": [
+    "vibe.cli.autocompletion.base",
+    "vibe.cli.autocompletion.slash_command",
+    "vibe.core.autocompletion.completers"
+  ],
+  "tests.autocompletion.test_ui_chat_autocompletion": [
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.chat_input.completion_popup",
+    "vibe.cli.textual_ui.widgets.chat_input.container"
+  ],
+  "tests.backend.data.fireworks": [
+    "tests.backend.data"
+  ],
+  "tests.backend.data.mistral": [
+    "tests.backend.data"
+  ],
+  "tests.backend.test_anthropic_adapter": [
+    "vibe.core.config",
+    "vibe.core.llm.backend.anthropic",
+    "vibe.core.types"
+  ],
+  "tests.backend.test_backend": [
+    "tests.backend.data",
+    "tests.backend.data.fireworks",
+    "tests.backend.data.mistral",
+    "vibe.core.config",
+    "vibe.core.llm.backend.factory",
+    "vibe.core.llm.backend.generic",
+    "vibe.core.llm.backend.mistral",
+    "vibe.core.llm.exceptions",
+    "vibe.core.llm.types",
+    "vibe.core.types",
+    "vibe.core.utils"
+  ],
+  "tests.backend.test_vertex_anthropic_adapter": [
+    "vibe.core.config",
+    "vibe.core.llm.backend.vertex",
+    "vibe.core.types"
+  ],
+  "tests.cli.plan_offer.adapters.fake_whoami_gateway": [
+    "vibe.cli.plan_offer.ports.whoami_gateway"
+  ],
+  "tests.cli.plan_offer.test_decide_plan_offer": [
+    "tests.cli.plan_offer.adapters.fake_whoami_gateway",
+    "vibe.cli.plan_offer.decide_plan_offer",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.core.config"
+  ],
+  "tests.cli.plan_offer.test_http_whoami_gateway": [
+    "vibe.cli.plan_offer.adapters.http_whoami_gateway",
+    "vibe.cli.plan_offer.ports.whoami_gateway"
+  ],
+  "tests.cli.test_bell_notifications": [
+    "vibe.cli.textual_ui.notifications"
+  ],
+  "tests.cli.test_braille_renderer": [
+    "vibe.cli.textual_ui.widgets.braille_renderer"
+  ],
+  "tests.cli.test_clipboard": [
+    "vibe.cli.clipboard",
+    "vibe.cli.clipboard"
+  ],
+  "tests.cli.test_commands": [
+    "vibe.cli.commands"
+  ],
+  "tests.cli.test_copy_shortcuts": [
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.base_snapshot_test_app"
+  ],
+  "tests.cli.test_external_editor": [
+    "vibe.cli.textual_ui.external_editor"
+  ],
+  "tests.cli.test_no_markup_static": [
+    "vibe.cli.textual_ui.widgets.no_markup_static"
+  ],
+  "tests.cli.test_question_app": [
+    "vibe.core.tools.builtins.ask_user_question",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.question_app"
+  ],
+  "tests.cli.test_spinner": [
+    "vibe.cli.textual_ui.widgets.spinner"
+  ],
+  "tests.cli.test_switching_mode": [
+    "tests.conftest",
+    "vibe.cli.textual_ui.widgets.chat_input",
+    "vibe.cli.textual_ui.widgets.chat_input.body",
+    "vibe.cli.textual_ui.widgets.messages"
+  ],
+  "tests.cli.test_ui_clipboard_notifications": [
+    "vibe.cli.clipboard",
+    "vibe.cli.textual_ui.app"
+  ],
+  "tests.cli.test_ui_session_incremental_renderer": [
+    "tests.cli.plan_offer.adapters.fake_whoami_gateway",
+    "tests.conftest",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.load_more",
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.windowing",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "tests.cli.test_ui_session_resume": [
+    "tests.cli.plan_offer.adapters.fake_whoami_gateway",
+    "tests.conftest",
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "tests.update_notifier.adapters.fake_update_gateway",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.cli.update_notifier",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "tests.cli.textual_ui.test_session_picker": [
+    "vibe.cli.textual_ui.widgets.session_picker",
+    "vibe.core.session.session_loader"
+  ],
+  "tests.conftest": [
+    "tests.cli.plan_offer.adapters.fake_whoami_gateway",
+    "tests.stubs.fake_backend",
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "tests.update_notifier.adapters.fake_update_gateway",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.cli.textual_ui.app",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.llm.types",
+    "vibe.core.paths",
+    "vibe.core.paths.config_paths"
+  ],
+  "tests.core.test_agents": [
+    "tests.conftest",
+    "vibe.core.agents.manager",
+    "vibe.core.agents.models"
+  ],
+  "tests.core.test_auth_crypto": [
+    "vibe.core.auth"
+  ],
+  "tests.core.test_auth_github": [
+    "vibe.core.auth.github"
+  ],
+  "tests.core.test_config_load_dotenv": [
+    "vibe.core.config"
+  ],
+  "tests.core.test_config_paths": [
+    "vibe.core.paths.config_paths"
+  ],
+  "tests.core.test_config_resolution": [
+    "vibe.core.paths.config_paths",
+    "vibe.core.paths.global_paths",
+    "vibe.core.trusted_folders"
+  ],
+  "tests.core.test_file_logging": [
+    "vibe.core.logger"
+  ],
+  "tests.core.test_proxy_setup": [
+    "vibe.core.paths.global_paths",
+    "vibe.core.proxy_setup"
+  ],
+  "tests.core.test_telemetry_send": [
+    "tests.conftest",
+    "tests.stubs.fake_tool",
+    "vibe.core.agent_loop",
+    "vibe.core.config",
+    "vibe.core.llm.format",
+    "vibe.core.telemetry.send",
+    "vibe.core.tools.base",
+    "vibe.core.utils",
+    "vibe.core.tools.builtins.write_file"
+  ],
+  "tests.core.test_teleport_git": [
+    "vibe.core.teleport.errors",
+    "vibe.core.teleport.git"
+  ],
+  "tests.core.test_teleport_nuage": [
+    "vibe.core.auth",
+    "vibe.core.teleport.errors",
+    "vibe.core.teleport.nuage"
+  ],
+  "tests.core.test_teleport_service": [
+    "vibe.core.teleport.errors",
+    "vibe.core.teleport.git",
+    "vibe.core.teleport.nuage",
+    "vibe.core.teleport.teleport",
+    "vibe.core.teleport.types"
+  ],
+  "tests.core.test_trusted_folders": [
+    "vibe.core.paths.global_paths",
+    "vibe.core.trusted_folders"
+  ],
+  "tests.e2e.conftest": [
+    "tests",
+    "tests.e2e.common",
+    "tests.e2e.mock_server"
+  ],
+  "tests.e2e.test_cli_tui_onboarding": [
+    "tests.e2e.common"
+  ],
+  "tests.e2e.test_cli_tui_streaming": [
+    "tests.e2e.common",
+    "tests.e2e.mock_server"
+  ],
+  "tests.e2e.test_cli_tui_tool_approval": [
+    "tests.e2e.common",
+    "tests.e2e.mock_server"
+  ],
+  "tests.mock.mock_backend_factory": [
+    "vibe.core.config",
+    "vibe.core.llm.backend.factory"
+  ],
+  "tests.mock.mock_entrypoint": [
+    "vibe.core.paths.config_paths",
+    "tests",
+    "tests.mock.utils",
+    "vibe.core.types",
+    "vibe.acp.entrypoint"
+  ],
+  "tests.mock.utils": [
+    "vibe.core.types"
+  ],
+  "tests.onboarding.test_run_onboarding": [
+    "vibe"
+  ],
+  "tests.onboarding.test_ui_onboarding": [
+    "vibe.core.paths.global_paths",
+    "vibe.setup.onboarding",
+    "vibe.setup.onboarding.screens.api_key"
+  ],
+  "tests.session.test_session_loader": [
+    "vibe.core.config",
+    "vibe.core.session.session_loader",
+    "vibe.core.types"
+  ],
+  "tests.session.test_session_logger": [
+    "tests.conftest",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.session.session_logger",
+    "vibe.core.tools.manager",
+    "vibe.core.types"
+  ],
+  "tests.session.test_session_migration": [
+    "vibe.core.config",
+    "vibe.core.session.session_migration"
+  ],
+  "tests.skills.conftest": [
+    "tests.conftest",
+    "vibe.core.config"
+  ],
+  "tests.skills.test_manager": [
+    "tests.conftest",
+    "tests.skills.conftest",
+    "vibe.core.config",
+    "vibe.core.skills.manager",
+    "vibe.core.trusted_folders"
+  ],
+  "tests.skills.test_models": [
+    "vibe.core.skills.models"
+  ],
+  "tests.skills.test_parser": [
+    "vibe.core.skills.parser"
+  ],
+  "tests.snapshots.base_snapshot_test_app": [
+    "tests.cli.plan_offer.adapters.fake_whoami_gateway",
+    "tests.conftest",
+    "tests.stubs.fake_backend",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.chat_input",
+    "vibe.core.agents.models",
+    "vibe.core.config"
+  ],
+  "tests.snapshots.test_ui_snapshot_ask_user_question": [
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.core.tools.builtins.ask_user_question",
+    "vibe.core.types"
+  ],
+  "tests.snapshots.test_ui_snapshot_basic_conversation": [
+    "tests.mock.utils",
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "tests.stubs.fake_backend"
+  ],
+  "tests.snapshots.test_ui_snapshot_code_block_horizontal_scrolling": [
+    "tests.snapshots.snap_compare",
+    "vibe.cli.textual_ui.widgets.messages"
+  ],
+  "tests.snapshots.test_ui_snapshot_empty_assistant_before_reasoning": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "tests.stubs.fake_backend"
+  ],
+  "tests.snapshots.test_ui_snapshot_modes": [
+    "tests.snapshots.snap_compare"
+  ],
+  "tests.snapshots.test_ui_snapshot_parallel_tool_calls": [
+    "tests.snapshots.snap_compare",
+    "vibe.cli.textual_ui.handlers.event_handler",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.core.tools.builtins.read_file",
+    "vibe.core.types"
+  ],
+  "tests.snapshots.test_ui_snapshot_proxy_setup": [
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "vibe.core.proxy_setup"
+  ],
+  "tests.snapshots.test_ui_snapshot_question_app": [
+    "tests.snapshots.snap_compare",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.core.tools.builtins.ask_user_question"
+  ],
+  "tests.snapshots.test_ui_snapshot_reasoning_content": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "tests.stubs.fake_backend",
+    "vibe.cli.textual_ui.widgets.messages"
+  ],
+  "tests.snapshots.test_ui_snapshot_release_update_notification": [
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "tests.update_notifier.adapters.fake_update_gateway",
+    "vibe.cli.update_notifier"
+  ],
+  "tests.snapshots.test_ui_snapshot_session_resume": [
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "vibe.core.types"
+  ],
+  "tests.snapshots.test_ui_snapshot_streaming_tool_call": [
+    "tests.snapshots.snap_compare",
+    "vibe.cli.textual_ui.widgets.status_message",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.core.tools.builtins.read_file",
+    "vibe.core.types"
+  ],
+  "tests.snapshots.test_ui_snapshot_teleport": [
+    "tests.snapshots.snap_compare",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.teleport_message",
+    "vibe.core.tools.builtins.ask_user_question"
+  ],
+  "tests.snapshots.test_ui_snapshot_whats_new": [
+    "tests.cli.plan_offer.adapters.fake_whoami_gateway",
+    "tests.snapshots.base_snapshot_test_app",
+    "tests.snapshots.snap_compare",
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "tests.update_notifier.adapters.fake_update_gateway",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.cli.update_notifier"
+  ],
+  "tests.stubs.fake_backend": [
+    "tests.mock.utils",
+    "vibe.core.types"
+  ],
+  "tests.stubs.fake_tool": [
+    "vibe.core.tools.base",
+    "vibe.core.types"
+  ],
+  "tests.test_agent_auto_compact": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.types"
+  ],
+  "tests.test_agent_backend": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "tests.test_agent_observer_streaming": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.llm.exceptions",
+    "vibe.core.middleware",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.todo",
+    "vibe.core.types",
+    "vibe.core.utils"
+  ],
+  "tests.test_agent_stats": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.tools.base",
+    "vibe.core.types"
+  ],
+  "tests.test_agent_tool_call": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "tests.stubs.fake_tool",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.todo",
+    "vibe.core.types"
+  ],
+  "tests.test_agents": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.agents.manager",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.paths.config_paths",
+    "vibe.core.paths.global_paths",
+    "vibe.core.tools.base",
+    "vibe.core.types"
+  ],
+  "tests.test_cli_programmatic_preload": [
+    "tests.conftest",
+    "tests.mock.mock_backend_factory",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "tests.test_history_manager": [
+    "vibe.cli.history_manager"
+  ],
+  "tests.test_message_id": [
+    "vibe.core.types"
+  ],
+  "tests.test_message_merging": [
+    "vibe.core.llm.message_utils",
+    "vibe.core.types"
+  ],
+  "tests.test_middleware": [
+    "tests.conftest",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.middleware",
+    "vibe.core.types"
+  ],
+  "tests.test_reasoning_content": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.config",
+    "vibe.core.llm.backend.generic",
+    "vibe.core.llm.backend.mistral",
+    "vibe.core.llm.format",
+    "vibe.core.types"
+  ],
+  "tests.test_system_prompt": [
+    "tests.conftest",
+    "vibe.core.agents",
+    "vibe.core.skills.manager",
+    "vibe.core.system_prompt",
+    "vibe.core.tools.manager"
+  ],
+  "tests.test_tagged_text": [
+    "vibe.core.utils"
+  ],
+  "tests.test_ui_external_editor": [
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.chat_input.container"
+  ],
+  "tests.test_ui_input_history": [
+    "vibe.cli.history_manager",
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.chat_input.body",
+    "vibe.cli.textual_ui.widgets.chat_input.container"
+  ],
+  "tests.tools.test_ask_user_question": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.ask_user_question",
+    "vibe.core.types",
+    "vibe.core.tools.base"
+  ],
+  "tests.tools.test_bash": [
+    "tests.mock.utils",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.bash"
+  ],
+  "tests.tools.test_grep": [
+    "tests.mock.utils",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.grep"
+  ],
+  "tests.tools.test_invoke_context": [
+    "tests.mock.utils",
+    "vibe.core.tools.base",
+    "vibe.core.types"
+  ],
+  "tests.tools.test_manager_get_tool_config": [
+    "tests.conftest",
+    "vibe.core.tools.base",
+    "vibe.core.tools.manager",
+    "vibe.core.tools.builtins.todo"
+  ],
+  "tests.tools.test_mcp": [
+    "vibe.core.config",
+    "vibe.core.tools.mcp"
+  ],
+  "tests.tools.test_mcp_sampling": [
+    "tests.mock.utils",
+    "tests.stubs.fake_backend",
+    "vibe.core.tools.mcp_sampling",
+    "vibe.core.types"
+  ],
+  "tests.tools.test_task": [
+    "tests.conftest",
+    "tests.mock.utils",
+    "vibe.core.agents.manager",
+    "vibe.core.agents.models",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.task",
+    "vibe.core.types"
+  ],
+  "tests.tools.test_ui_bash_execution": [
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.chat_input.container",
+    "vibe.cli.textual_ui.widgets.messages"
+  ],
+  "tests.tools.test_webfetch": [
+    "tests.mock.utils",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.webfetch"
+  ],
+  "tests.tools.test_websearch": [
+    "tests.mock.utils",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.websearch"
+  ],
+  "tests.update_notifier.adapters.fake_update_cache_repository": [
+    "vibe.cli.update_notifier.ports.update_cache_repository"
+  ],
+  "tests.update_notifier.adapters.fake_update_gateway": [
+    "vibe.cli.update_notifier.ports.update_gateway"
+  ],
+  "tests.update_notifier.test_do_update": [
+    "vibe.cli.update_notifier.update"
+  ],
+  "tests.update_notifier.test_filesystem_update_cache_repository": [
+    "vibe.cli.update_notifier.adapters.filesystem_update_cache_repository",
+    "vibe.cli.update_notifier.ports.update_cache_repository"
+  ],
+  "tests.update_notifier.test_github_update_gateway": [
+    "vibe.cli.update_notifier"
+  ],
+  "tests.update_notifier.test_pypi_update_gateway": [
+    "vibe.cli.update_notifier.adapters.pypi_update_gateway",
+    "vibe.cli.update_notifier.ports.update_gateway"
+  ],
+  "tests.update_notifier.test_ui_update_notification": [
+    "tests.conftest",
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "tests.update_notifier.adapters.fake_update_gateway",
+    "vibe.cli.textual_ui.app",
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.update_notifier",
+    "vibe.core.config"
+  ],
+  "tests.update_notifier.test_update_use_case": [
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "tests.update_notifier.adapters.fake_update_gateway",
+    "vibe.cli.update_notifier",
+    "vibe.cli.update_notifier.update"
+  ],
+  "tests.update_notifier.test_whats_new": [
+    "tests.update_notifier.adapters.fake_update_cache_repository",
+    "vibe.cli.update_notifier",
+    "vibe.cli.update_notifier.whats_new"
+  ],
+  "vibe.acp.acp_agent_loop": [
+    "vibe",
+    "vibe.acp.acp_logger",
+    "vibe.acp.tools.base",
+    "vibe.acp.tools.session_update",
+    "vibe.acp.utils",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.autocompletion.path_prompt_adapter",
+    "vibe.core.config",
+    "vibe.core.proxy_setup",
+    "vibe.core.session.session_loader",
+    "vibe.core.tools.base",
+    "vibe.core.types",
+    "vibe.core.utils"
+  ],
+  "vibe.acp.entrypoint": [
+    "vibe",
+    "vibe.core.config",
+    "vibe.core.logger",
+    "vibe.core.paths.config_paths",
+    "vibe.acp.acp_agent_loop",
+    "vibe.setup.onboarding"
+  ],
+  "vibe.acp.tools.base": [
+    "vibe.core.logger",
+    "vibe.core.tools.base",
+    "vibe.core.tools.manager",
+    "vibe.core.types"
+  ],
+  "vibe.acp.tools.builtins.bash": [
+    "vibe",
+    "vibe.acp.tools.base",
+    "vibe.core.logger",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.bash",
+    "vibe.core.types"
+  ],
+  "vibe.acp.tools.builtins.read_file": [
+    "vibe",
+    "vibe.acp.tools.base",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.read_file"
+  ],
+  "vibe.acp.tools.builtins.search_replace": [
+    "vibe",
+    "vibe.acp.tools.base",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.search_replace",
+    "vibe.core.types"
+  ],
+  "vibe.acp.tools.builtins.todo": [
+    "vibe",
+    "vibe.acp.tools.base",
+    "vibe.core.tools.builtins.todo",
+    "vibe.core.types"
+  ],
+  "vibe.acp.tools.builtins.write_file": [
+    "vibe",
+    "vibe.acp.tools.base",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.write_file",
+    "vibe.core.types"
+  ],
+  "vibe.acp.tools.session_update": [
+    "vibe.acp.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.utils"
+  ],
+  "vibe.acp.utils": [
+    "vibe.core.agents.models",
+    "vibe.core.proxy_setup",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.core.config"
+  ],
+  "vibe.cli.autocompletion.path_completion": [
+    "vibe.cli.autocompletion.base",
+    "vibe.core.autocompletion.completers"
+  ],
+  "vibe.cli.autocompletion.slash_command": [
+    "vibe.cli.autocompletion.base",
+    "vibe.core.autocompletion.completers"
+  ],
+  "vibe.cli.cli": [
+    "vibe",
+    "vibe.cli.textual_ui.app",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.logger",
+    "vibe.core.paths.config_paths",
+    "vibe.core.programmatic",
+    "vibe.core.session.session_loader",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.setup.onboarding"
+  ],
+  "vibe.cli.entrypoint": [
+    "vibe",
+    "vibe.core.agents.models",
+    "vibe.core.paths.config_paths",
+    "vibe.core.trusted_folders",
+    "vibe.setup.trusted_folders.trust_folder_dialog",
+    "vibe.cli.cli"
+  ],
+  "vibe.cli.plan_offer.adapters.http_whoami_gateway": [
+    "vibe.cli.plan_offer.ports.whoami_gateway"
+  ],
+  "vibe.cli.plan_offer.decide_plan_offer": [
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.core.config"
+  ],
+  "vibe.cli.textual_ui.app": [
+    "vibe",
+    "vibe.cli.clipboard",
+    "vibe.cli.commands",
+    "vibe.cli.plan_offer.adapters.http_whoami_gateway",
+    "vibe.cli.plan_offer.decide_plan_offer",
+    "vibe.cli.plan_offer.ports.whoami_gateway",
+    "vibe.cli.terminal_setup",
+    "vibe.cli.textual_ui.handlers.event_handler",
+    "vibe.cli.textual_ui.notifications",
+    "vibe.cli.textual_ui.widgets.approval_app",
+    "vibe.cli.textual_ui.widgets.banner.banner",
+    "vibe.cli.textual_ui.widgets.chat_input",
+    "vibe.cli.textual_ui.widgets.compact",
+    "vibe.cli.textual_ui.widgets.config_app",
+    "vibe.cli.textual_ui.widgets.context_progress",
+    "vibe.cli.textual_ui.widgets.load_more",
+    "vibe.cli.textual_ui.widgets.loading",
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.path_display",
+    "vibe.cli.textual_ui.widgets.proxy_setup_app",
+    "vibe.cli.textual_ui.widgets.question_app",
+    "vibe.cli.textual_ui.widgets.session_picker",
+    "vibe.cli.textual_ui.widgets.teleport_message",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.cli.textual_ui.windowing",
+    "vibe.cli.update_notifier",
+    "vibe.cli.update_notifier.update",
+    "vibe.core.agent_loop",
+    "vibe.core.agents",
+    "vibe.core.autocompletion.path_prompt_adapter",
+    "vibe.core.config",
+    "vibe.core.logger",
+    "vibe.core.paths.config_paths",
+    "vibe.core.session.session_loader",
+    "vibe.core.teleport.types",
+    "vibe.core.tools.base",
+    "vibe.core.tools.builtins.ask_user_question",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.cli.textual_ui.widgets.chat_input.body",
+    "vibe.core.wiki.site_builder"
+  ],
+  "vibe.cli.textual_ui.handlers": [
+    "vibe.cli.textual_ui.handlers.event_handler"
+  ],
+  "vibe.cli.textual_ui.handlers.event_handler": [
+    "vibe.cli.textual_ui.widgets.compact",
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.cli.textual_ui.widgets.loading"
+  ],
+  "vibe.cli.textual_ui.notifications": [
+    "vibe.cli.textual_ui.notifications.adapters.textual_notification_adapter",
+    "vibe.cli.textual_ui.notifications.ports.notification_port"
+  ],
+  "vibe.cli.textual_ui.notifications.adapters.textual_notification_adapter": [
+    "vibe.cli.textual_ui.notifications.ports.notification_port"
+  ],
+  "vibe.cli.textual_ui.widgets.approval_app": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.tool_widgets",
+    "vibe.core.config"
+  ],
+  "vibe.cli.textual_ui.widgets.banner.banner": [
+    "vibe",
+    "vibe.cli.textual_ui.widgets.banner.petit_chat",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.config",
+    "vibe.core.skills.manager"
+  ],
+  "vibe.cli.textual_ui.widgets.banner.petit_chat": [
+    "vibe.cli.textual_ui.widgets.braille_renderer"
+  ],
+  "vibe.cli.textual_ui.widgets.chat_input": [
+    "vibe.cli.textual_ui.widgets.chat_input.body",
+    "vibe.cli.textual_ui.widgets.chat_input.container",
+    "vibe.cli.textual_ui.widgets.chat_input.text_area"
+  ],
+  "vibe.cli.textual_ui.widgets.chat_input.body": [
+    "vibe.cli.history_manager",
+    "vibe.cli.textual_ui.widgets.chat_input.mic_button",
+    "vibe.cli.textual_ui.widgets.chat_input.text_area",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.spinner",
+    "vibe.core.logger",
+    "vibe.core.voice.recorder",
+    "vibe.cli.textual_ui.widgets.chat_input.waveform",
+    "vibe.cli.textual_ui.widgets.chat_input.waveform",
+    "vibe.core.voice.transcriber"
+  ],
+  "vibe.cli.textual_ui.widgets.chat_input.completion_manager": [
+    "vibe.cli.autocompletion.base"
+  ],
+  "vibe.cli.textual_ui.widgets.chat_input.container": [
+    "vibe.cli.autocompletion.path_completion",
+    "vibe.cli.autocompletion.slash_command",
+    "vibe.cli.commands",
+    "vibe.cli.textual_ui.widgets.chat_input.body",
+    "vibe.cli.textual_ui.widgets.chat_input.completion_manager",
+    "vibe.cli.textual_ui.widgets.chat_input.completion_popup",
+    "vibe.cli.textual_ui.widgets.chat_input.text_area",
+    "vibe.core.agents",
+    "vibe.core.autocompletion.completers"
+  ],
+  "vibe.cli.textual_ui.widgets.chat_input.text_area": [
+    "vibe.cli.autocompletion.base",
+    "vibe.cli.textual_ui.external_editor",
+    "vibe.cli.textual_ui.widgets.chat_input.completion_manager"
+  ],
+  "vibe.cli.textual_ui.widgets.chat_input.waveform": [
+    "vibe.core.voice.recorder"
+  ],
+  "vibe.cli.textual_ui.widgets.compact": [
+    "vibe.cli.textual_ui.widgets.status_message",
+    "vibe.core.utils"
+  ],
+  "vibe.cli.textual_ui.widgets.config_app": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.config"
+  ],
+  "vibe.cli.textual_ui.widgets.context_progress": [
+    "vibe.cli.textual_ui.widgets.no_markup_static"
+  ],
+  "vibe.cli.textual_ui.widgets.loading": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.spinner"
+  ],
+  "vibe.cli.textual_ui.widgets.messages": [
+    "vibe.cli.textual_ui.ansi_markdown",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.spinner"
+  ],
+  "vibe.cli.textual_ui.widgets.path_display": [
+    "vibe.cli.textual_ui.widgets.no_markup_static"
+  ],
+  "vibe.cli.textual_ui.widgets.proxy_setup_app": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.proxy_setup"
+  ],
+  "vibe.cli.textual_ui.widgets.question_app": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.tools.builtins.ask_user_question",
+    "vibe.core.tools.builtins.ask_user_question"
+  ],
+  "vibe.cli.textual_ui.widgets.session_picker": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.session.session_loader"
+  ],
+  "vibe.cli.textual_ui.widgets.spinner": [
+    "vibe.cli.textual_ui.widgets.braille_renderer"
+  ],
+  "vibe.cli.textual_ui.widgets.status_message": [
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.spinner"
+  ],
+  "vibe.cli.textual_ui.widgets.teleport_message": [
+    "vibe.cli.textual_ui.widgets.status_message"
+  ],
+  "vibe.cli.textual_ui.widgets.tool_widgets": [
+    "vibe.cli.textual_ui.ansi_markdown",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.tools.builtins.ask_user_question",
+    "vibe.core.tools.builtins.bash",
+    "vibe.core.tools.builtins.grep",
+    "vibe.core.tools.builtins.read_file",
+    "vibe.core.tools.builtins.search_replace",
+    "vibe.core.tools.builtins.todo",
+    "vibe.core.tools.builtins.write_file"
+  ],
+  "vibe.cli.textual_ui.widgets.tools": [
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.cli.textual_ui.widgets.status_message",
+    "vibe.cli.textual_ui.widgets.tool_widgets",
+    "vibe.core.tools.ui",
+    "vibe.core.types"
+  ],
+  "vibe.cli.textual_ui.windowing": [
+    "vibe.cli.textual_ui.windowing.history",
+    "vibe.cli.textual_ui.windowing.history_windowing",
+    "vibe.cli.textual_ui.windowing.state"
+  ],
+  "vibe.cli.textual_ui.windowing.history": [
+    "vibe.cli.textual_ui.widgets.messages",
+    "vibe.cli.textual_ui.widgets.tools",
+    "vibe.core.types"
+  ],
+  "vibe.cli.textual_ui.windowing.history_windowing": [
+    "vibe.cli.textual_ui.windowing.history",
+    "vibe.cli.textual_ui.windowing.state",
+    "vibe.core.types"
+  ],
+  "vibe.cli.textual_ui.windowing.state": [
+    "vibe.cli.textual_ui.widgets.load_more",
+    "vibe.core.types"
+  ],
+  "vibe.cli.update_notifier": [
+    "vibe.cli.update_notifier.adapters.filesystem_update_cache_repository",
+    "vibe.cli.update_notifier.adapters.github_update_gateway",
+    "vibe.cli.update_notifier.adapters.pypi_update_gateway",
+    "vibe.cli.update_notifier.ports.update_cache_repository",
+    "vibe.cli.update_notifier.ports.update_gateway",
+    "vibe.cli.update_notifier.update",
+    "vibe.cli.update_notifier.whats_new"
+  ],
+  "vibe.cli.update_notifier.adapters.filesystem_update_cache_repository": [
+    "vibe.cli.update_notifier.ports.update_cache_repository",
+    "vibe.core.paths.global_paths"
+  ],
+  "vibe.cli.update_notifier.adapters.github_update_gateway": [
+    "vibe.cli.update_notifier.ports.update_gateway"
+  ],
+  "vibe.cli.update_notifier.adapters.pypi_update_gateway": [
+    "vibe.cli.update_notifier.ports.update_gateway"
+  ],
+  "vibe.cli.update_notifier.update": [
+    "vibe.cli.update_notifier"
+  ],
+  "vibe.cli.update_notifier.whats_new": [
+    "vibe",
+    "vibe.cli.update_notifier.ports.update_cache_repository"
+  ],
+  "vibe.core": [
+    "vibe.core.programmatic"
+  ],
+  "vibe.core.agent_loop": [
+    "vibe.cli.terminal_setup",
+    "vibe.core.agents.manager",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.llm.backend.factory",
+    "vibe.core.llm.exceptions",
+    "vibe.core.llm.format",
+    "vibe.core.llm.types",
+    "vibe.core.middleware",
+    "vibe.core.prompts",
+    "vibe.core.session.session_logger",
+    "vibe.core.session.session_migration",
+    "vibe.core.skills.manager",
+    "vibe.core.system_prompt",
+    "vibe.core.telemetry.send",
+    "vibe.core.tools.base",
+    "vibe.core.tools.manager",
+    "vibe.core.tools.mcp",
+    "vibe.core.tools.mcp_sampling",
+    "vibe.core.trusted_folders",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.core.teleport.teleport",
+    "vibe.core.teleport.nuage",
+    "vibe.core.teleport.teleport",
+    "vibe.core.teleport.types",
+    "vibe.core.teleport.nuage",
+    "vibe.core.teleport.errors"
+  ],
+  "vibe.core.agents": [
+    "vibe.core.agents.manager",
+    "vibe.core.agents.models"
+  ],
+  "vibe.core.agents.manager": [
+    "vibe.core.agents.models",
+    "vibe.core.logger",
+    "vibe.core.paths.config_paths",
+    "vibe.core.paths.global_paths",
+    "vibe.core.utils",
+    "vibe.core.config"
+  ],
+  "vibe.core.agents.models": [
+    "vibe.core.config",
+    "vibe.core.config"
+  ],
+  "vibe.core.auth": [
+    "vibe.core.auth.crypto",
+    "vibe.core.auth.github"
+  ],
+  "vibe.core.autocompletion.completers": [
+    "vibe.core.autocompletion.file_indexer",
+    "vibe.core.autocompletion.fuzzy"
+  ],
+  "vibe.core.autocompletion.file_indexer": [
+    "vibe.core.autocompletion.file_indexer.indexer",
+    "vibe.core.autocompletion.file_indexer.store"
+  ],
+  "vibe.core.autocompletion.file_indexer.indexer": [
+    "vibe.core.autocompletion.file_indexer.ignore_rules",
+    "vibe.core.autocompletion.file_indexer.store",
+    "vibe.core.autocompletion.file_indexer.watcher"
+  ],
+  "vibe.core.autocompletion.file_indexer.store": [
+    "vibe.core.autocompletion.file_indexer.ignore_rules",
+    "vibe.core.autocompletion.file_indexer.watcher"
+  ],
+  "vibe.core.autocompletion.path_prompt_adapter": [
+    "vibe.core.autocompletion.path_prompt"
+  ],
+  "vibe.core.config": [
+    "vibe.core.paths.config_paths",
+    "vibe.core.paths.global_paths",
+    "vibe.core.prompts",
+    "vibe.core.tools.base",
+    "vibe.core.tools.manager"
+  ],
+  "vibe.core.llm.backend.anthropic": [
+    "vibe.core.config",
+    "vibe.core.llm.backend.base",
+    "vibe.core.types"
+  ],
+  "vibe.core.llm.backend.base": [
+    "vibe.core.types",
+    "vibe.core.config"
+  ],
+  "vibe.core.llm.backend.factory": [
+    "vibe.core.config",
+    "vibe.core.llm.backend.generic",
+    "vibe.core.llm.backend.mistral"
+  ],
+  "vibe.core.llm.backend.generic": [
+    "vibe.core.llm.backend.anthropic",
+    "vibe.core.llm.backend.base",
+    "vibe.core.llm.backend.vertex",
+    "vibe.core.llm.exceptions",
+    "vibe.core.llm.message_utils",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.core.config"
+  ],
+  "vibe.core.llm.backend.mistral": [
+    "vibe.core.llm.exceptions",
+    "vibe.core.llm.message_utils",
+    "vibe.core.types",
+    "vibe.core.config"
+  ],
+  "vibe.core.llm.backend.vertex": [
+    "vibe.core.config",
+    "vibe.core.llm.backend.anthropic",
+    "vibe.core.llm.backend.base",
+    "vibe.core.types"
+  ],
+  "vibe.core.llm.exceptions": [
+    "vibe.core.types"
+  ],
+  "vibe.core.llm.format": [
+    "vibe.core.tools.base",
+    "vibe.core.types",
+    "vibe.core.tools.manager"
+  ],
+  "vibe.core.llm.message_utils": [
+    "vibe.core.types"
+  ],
+  "vibe.core.llm.types": [
+    "vibe.core.types",
+    "vibe.core.config"
+  ],
+  "vibe.core.logger": [
+    "vibe.core.paths.global_paths"
+  ],
+  "vibe.core.middleware": [
+    "vibe.core.agents",
+    "vibe.core.utils",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "vibe.core.output_formatters": [
+    "vibe.core.types"
+  ],
+  "vibe.core.paths.config_paths": [
+    "vibe.core.paths.global_paths",
+    "vibe.core.paths.local_config_walk",
+    "vibe.core.trusted_folders"
+  ],
+  "vibe.core.paths.global_paths": [
+    "vibe"
+  ],
+  "vibe.core.paths.local_config_walk": [
+    "vibe.core.autocompletion.file_indexer.ignore_rules"
+  ],
+  "vibe.core.programmatic": [
+    "vibe",
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.logger",
+    "vibe.core.output_formatters",
+    "vibe.core.types",
+    "vibe.core.utils"
+  ],
+  "vibe.core.prompts": [
+    "vibe"
+  ],
+  "vibe.core.proxy_setup": [
+    "vibe.core.paths.global_paths"
+  ],
+  "vibe.core.session.session_loader": [
+    "vibe.core.types",
+    "vibe.core.config"
+  ],
+  "vibe.core.session.session_logger": [
+    "vibe.core.session.session_loader",
+    "vibe.core.types",
+    "vibe.core.utils",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.tools.manager"
+  ],
+  "vibe.core.session.session_migration": [
+    "vibe.core.config",
+    "vibe.core.session.session_logger"
+  ],
+  "vibe.core.skills": [
+    "vibe.core.skills.manager",
+    "vibe.core.skills.models",
+    "vibe.core.skills.parser"
+  ],
+  "vibe.core.skills.manager": [
+    "vibe.core.logger",
+    "vibe.core.paths.config_paths",
+    "vibe.core.paths.global_paths",
+    "vibe.core.skills.models",
+    "vibe.core.skills.parser",
+    "vibe.core.utils",
+    "vibe.core.config"
+  ],
+  "vibe.core.system_prompt": [
+    "vibe.core.prompts",
+    "vibe.core.trusted_folders",
+    "vibe.core.utils",
+    "vibe.core.agents",
+    "vibe.core.config",
+    "vibe.core.skills.manager",
+    "vibe.core.tools.manager"
+  ],
+  "vibe.core.telemetry.send": [
+    "vibe",
+    "vibe.core.config",
+    "vibe.core.llm.format",
+    "vibe.core.utils",
+    "vibe.core.agent_loop"
+  ],
+  "vibe.core.teleport.git": [
+    "vibe.core.teleport.errors",
+    "vibe.core.utils"
+  ],
+  "vibe.core.teleport.nuage": [
+    "vibe.core.auth",
+    "vibe.core.teleport.errors"
+  ],
+  "vibe.core.teleport.teleport": [
+    "vibe.core.auth.github",
+    "vibe.core.session.session_logger",
+    "vibe.core.teleport.errors",
+    "vibe.core.teleport.git",
+    "vibe.core.teleport.nuage",
+    "vibe.core.teleport.types"
+  ],
+  "vibe.core.teleport.types": [
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.base": [
+    "vibe.core.types",
+    "vibe.core.agents.manager",
+    "vibe.core.tools.mcp_sampling",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.ask_user_question": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.bash": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.utils"
+  ],
+  "vibe.core.tools.builtins.grep": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.read_file": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.tools.utils",
+    "vibe.core.types",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.search_replace": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.tools.utils",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.task": [
+    "vibe.core.agent_loop",
+    "vibe.core.agents.models",
+    "vibe.core.config",
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.todo": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.webfetch": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.websearch": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.builtins.wiki_diagram": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.wiki.plantuml"
+  ],
+  "vibe.core.tools.builtins.wiki_doc": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.wiki.site_builder",
+    "vibe.core.wiki.analyzer"
+  ],
+  "vibe.core.tools.builtins.write_file": [
+    "vibe.core.tools.base",
+    "vibe.core.tools.ui",
+    "vibe.core.tools.utils",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.manager": [
+    "vibe.core.logger",
+    "vibe.core.paths.config_paths",
+    "vibe.core.paths.global_paths",
+    "vibe.core.tools.base",
+    "vibe.core.tools.mcp",
+    "vibe.core.utils",
+    "vibe.core.config"
+  ],
+  "vibe.core.tools.mcp": [
+    "vibe.core.tools.mcp.registry",
+    "vibe.core.tools.mcp.tools"
+  ],
+  "vibe.core.tools.mcp.registry": [
+    "vibe.core.logger",
+    "vibe.core.tools.base",
+    "vibe.core.tools.mcp.tools",
+    "vibe.core.utils",
+    "vibe.core.config"
+  ],
+  "vibe.core.tools.mcp.tools": [
+    "vibe.core.logger",
+    "vibe.core.tools.base",
+    "vibe.core.tools.mcp_sampling",
+    "vibe.core.tools.ui",
+    "vibe.core.types",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.mcp_sampling": [
+    "vibe.core.llm.types",
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.ui": [
+    "vibe.core.types"
+  ],
+  "vibe.core.tools.utils": [
+    "vibe.core.tools.base"
+  ],
+  "vibe.core.trusted_folders": [
+    "vibe.core.paths.global_paths",
+    "vibe.core.paths.local_config_walk"
+  ],
+  "vibe.core.types": [
+    "vibe.core.tools.base"
+  ],
+  "vibe.core.utils": [
+    "vibe",
+    "vibe.core.config",
+    "vibe.core.types"
+  ],
+  "vibe.core.voice.recorder": [
+    "vibe.core.logger"
+  ],
+  "vibe.core.voice.transcriber": [
+    "vibe.core.logger"
+  ],
+  "vibe.core.wiki.analyzer": [
+    "vibe.core.wiki.source_linker"
+  ],
+  "vibe.core.wiki.architecture": [
+    "vibe.core.wiki.analyzer"
+  ],
+  "vibe.core.wiki.diagrams": [
+    "vibe.core.wiki.analyzer",
+    "vibe.core.wiki.architecture"
+  ],
+  "vibe.core.wiki.llm_doc": [
+    "vibe.core.wiki.analyzer",
+    "vibe.core.wiki.architecture",
+    "vibe.core.wiki.source_linker"
+  ],
+  "vibe.core.wiki.narrative": [
+    "vibe.core.wiki.analyzer",
+    "vibe.core.wiki.architecture",
+    "vibe.core.wiki.source_linker"
+  ],
+  "vibe.core.wiki.site_builder": [
+    "vibe.core.wiki.analyzer",
+    "vibe.core.wiki.architecture",
+    "vibe.core.wiki.build_state",
+    "vibe.core.wiki.diagrams",
+    "vibe.core.wiki.llm_doc",
+    "vibe.core.wiki.narrative",
+    "vibe.core.wiki.plantuml",
+    "vibe.core.wiki.source_linker"
+  ],
+  "vibe.setup.onboarding": [
+    "vibe.core.paths.global_paths",
+    "vibe.setup.onboarding.screens"
+  ],
+  "vibe.setup.onboarding.screens": [
+    "vibe.setup.onboarding.screens.api_key",
+    "vibe.setup.onboarding.screens.welcome"
+  ],
+  "vibe.setup.onboarding.screens.api_key": [
+    "vibe.cli.clipboard",
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.config",
+    "vibe.core.paths.global_paths",
+    "vibe.core.telemetry.send",
+    "vibe.setup.onboarding.base"
+  ],
+  "vibe.setup.onboarding.screens.welcome": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.setup.onboarding.base"
+  ],
+  "vibe.setup.trusted_folders.trust_folder_dialog": [
+    "vibe.cli.textual_ui.widgets.no_markup_static",
+    "vibe.core.paths.global_paths"
+  ]
+}

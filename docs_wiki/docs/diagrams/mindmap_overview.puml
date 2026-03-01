@@ -1,0 +1,59 @@
+@startmindmap
+* mistral-vibe v2.3.0
+** __init__.py
+***_ 7 lines, 0 classes
+** acp
+***_ 1993 lines, 19 classes
+*** VibeAcpAgentLoop
+*** Bash
+*** SearchReplace
+*** BaseAcpTool
+*** WriteFile
+** cli
+***_ 8764 lines, 106 classes
+*** VibeApp
+*** QuestionApp
+*** ChatTextArea
+*** ChatInputBody
+*** ChatInputContainer
+** core
+***_ 9690 lines, 158 classes
+*** AgentLoop
+*** GitRepository
+*** VibeConfig
+*** SessionLogger
+*** AnthropicAdapter
+** scripts
+***_ 496 lines, 0 classes
+** setup
+***_ 517 lines, 7 classes
+*** TrustFolderDialog
+*** WelcomeScreen
+*** ApiKeyScreen
+*** TrustFolderApp
+*** OnboardingScreen
+** tests
+***_ 28447 lines, 281 classes
+*** TestReadOnlyAgentMiddleware
+*** TestTrustedFoldersManager
+*** FakeClient
+*** TestStreamingEvents
+*** TestQuestionAppState
+** tools
+***_ 3982 lines, 86 classes
+*** SearchReplace
+*** BaseTool
+*** Grep
+*** ToolManager
+*** ReadFile
+** voice
+***_ 212 lines, 1 classes
+*** AudioRecorder
+** wiki
+***_ 2967 lines, 13 classes
+*** ProjectModel
+*** SubsystemCluster
+*** WikiBuildState
+*** ClassNode
+*** FunctionNode
+@endmindmap

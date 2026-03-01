@@ -1,0 +1,275 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — core"
+
+class "AgentLoop" {
+  +__init__()
+  +agent_profile()
+  +config()
+  +auto_approve()
+  +set_tool_permission()
+  +emit_new_session_telemetry()
+  +act()
+  +teleport_service()
+  .. +32 more ..
+}
+
+class "GitRepository" {
+  +__init__()
+  +__aenter__()
+  +__aexit__()
+  +is_supported()
+  +get_info()
+  +is_commit_pushed()
+  +get_unpushed_commit_count()
+  +push_current_branch()
+  .. +11 more ..
+}
+
+class "VibeConfig" <<Pydantic>> {
+  +active_model
+  +vim_keybindings
+  +disable_welcome_banner_animation
+  +autocopy_to_clipboard
+  +file_watcher_for_autocomplete
+  +nuage_api_key()
+  +system_prompt()
+  +get_active_model()
+  +get_provider_for_model()
+  {static} +settings_customise_sources()
+  {static} +save_updates()
+  {static} +dump_config()
+  {static} +load()
+  .. +9 more ..
+}
+
+class "SessionLogger" {
+  +__init__()
+  +save_folder()
+  +metadata_filepath()
+  +messages_filepath()
+  +git_commit()
+  +git_branch()
+  +username()
+  {static} +persist_metadata()
+  .. +8 more ..
+}
+
+class "AnthropicAdapter" {
+  +endpoint
+  +API_VERSION
+  +BETA_FEATURES
+  +THINKING_BUDGETS
+  +DEFAULT_ADAPTIVE_MAX_TOKENS
+  +__init__()
+  +prepare_request()
+  +parse_response()
+  .. +7 more ..
+}
+
+class "TelemetryClient" {
+  +__init__()
+  +client()
+  +send_telemetry_event()
+  +aclose()
+  +send_tool_call_finished()
+  +send_user_copied_text()
+  +send_user_cancelled_action()
+  +send_auto_compact_triggered()
+  .. +7 more ..
+}
+
+class "AgentManager" {
+  +__init__()
+  +available_agents()
+  +config()
+  +switch_profile()
+  +register_agent()
+  +invalidate_config()
+  +get_agent()
+  +get_subagents()
+  .. +6 more ..
+}
+
+class "MessageList" {
+  +__init__()
+  +append()
+  +insert()
+  +extend()
+  +reset()
+  +silent()
+  +__len__()
+  +__getitem__()
+  .. +6 more ..
+}
+
+class "GitHubAuthProvider" {
+  +__init__()
+  +__aenter__()
+  +__aexit__()
+  +get_token()
+  +has_token()
+  +delete_token()
+  +get_valid_token()
+  +start_device_flow()
+  .. +5 more ..
+}
+
+class "AnthropicMapper" {
+  +prepare_messages()
+  +prepare_tools()
+  +prepare_tool_choice()
+  +parse_response()
+  +parse_streaming_event()
+  .. +5 more ..
+}
+
+class "SessionLoader" {
+  {static} +latest_session()
+  {static} +find_latest_session()
+  {static} +find_session_by_id()
+  {static} +does_session_exist()
+  {static} +list_sessions()
+  {static} +load_metadata()
+  {static} +load_session()
+  {static} +get_first_user_message()
+  .. +5 more ..
+}
+
+class "TeleportService" {
+  +__init__()
+  +__aenter__()
+  +__aexit__()
+  +check_supported()
+  +is_supported()
+  +execute()
+  .. +5 more ..
+}
+
+class "PathCompleter" {
+  +__init__()
+  +get_completions()
+  +get_completion_items()
+  +get_replacement_range()
+  .. +3 more ..
+}
+
+class "FileIndexer" {
+  +__init__()
+  +stats()
+  +get_index()
+  +refresh()
+  +shutdown()
+  +__del__()
+  .. +2 more ..
+}
+
+class "GenericBackend" {
+  +__init__()
+  +__aenter__()
+  +__aexit__()
+  +complete()
+  +complete_streaming()
+  +count_tokens()
+  +close()
+  .. +2 more ..
+}
+
+class "NuageClient" {
+  +__init__()
+  +__aenter__()
+  +__aexit__()
+  +start_workflow()
+  +send_github_token()
+  +create_le_chat_thread()
+  .. +2 more ..
+}
+
+class "FileIndexStore" {
+  +__init__()
+  +root()
+  +clear()
+  +rebuild()
+  +snapshot()
+  +apply_changes()
+  .. +1 more ..
+}
+
+class "MistralBackend" {
+  +__init__()
+  +__aenter__()
+  +__aexit__()
+  +complete()
+  +complete_streaming()
+  +count_tokens()
+  .. +1 more ..
+}
+
+class "SkillManager" {
+  +__init__()
+  +available_skills()
+  +get_skill()
+  .. +1 more ..
+}
+
+class "ProjectContextProvider" {
+  +__init__()
+  +get_directory_structure()
+  +get_git_status()
+  +get_full_context()
+  .. +1 more ..
+}
+
+class "AgentStats" <<Pydantic>> {
+  +steps
+  +session_prompt_tokens
+  +session_completion_tokens
+  +tool_calls_agreed
+  +tool_calls_rejected
+  +__setattr__()
+  +trigger_listeners()
+  +add_listener()
+  {static} +create_fresh()
+  +session_total_llm_tokens()
+  +last_turn_total_tokens()
+  +session_cost()
+  +update_pricing()
+  .. +1 more ..
+}
+
+class "IgnoreRules" {
+  +__init__()
+  +get_walk_skip_dir_names()
+  +ensure_for_root()
+  +should_ignore()
+  +reset()
+}
+
+class "APIToolFormatHandler" {
+  +name()
+  +get_available_tools()
+  +get_tool_choice()
+  +process_api_response_message()
+  +parse_message()
+  +resolve_tool_calls()
+  +create_tool_response_message()
+  +create_failed_tool_response_message()
+}
+
+class "OpenAIAdapter" {
+  +endpoint
+  +build_payload()
+  +build_headers()
+  +prepare_request()
+  +parse_response()
+}
+
+class "TrustedFoldersManager" {
+  +__init__()
+  +is_trusted()
+  +add_trusted()
+  +add_untrusted()
+}
+
+@enduml

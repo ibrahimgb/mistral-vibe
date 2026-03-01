@@ -1,0 +1,4 @@
+trusted = [
+    "/home/ibrahim/Desktop/mistral-hakathon/mistral-vibe/docs_wiki",
+]
+untrusted = []

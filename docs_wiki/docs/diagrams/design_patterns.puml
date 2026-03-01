@@ -1,0 +1,42 @@
+@startmindmap
+* Design Patterns
+** Protocol Adapter
+*** Protocol / Adapter — UpdateCacheRepository
+*** Protocol / Adapter — UpdateGateway
+*** Protocol / Adapter — APIAdapter
+** Template Method
+*** Template Method — OutputFormatter
+*** Template Method — BaseTool
+*** Template Method — ToolUIData
+** Factory
+*** Factory — create_compact_start_session_update()
+*** Factory — create_compact_end_session_update()
+*** Factory — create_user_message_replay()
+*** Factory — create_assistant_message_replay()
+*** Factory — create_reasoning_replay()
+*** Factory — create_tool_call_replay()
+***_ +10 more
+** Middleware Pipeline
+*** Middleware Pipeline — vibe.core.middleware
+** Observer Streaming
+*** Async Streaming — VibeAcpAgentLoop
+*** Async Streaming — Bash
+*** Async Streaming — AgentLoop
+*** Async Streaming — GenericBackend
+*** Async Streaming — MistralBackend
+*** Async Streaming — TeleportService
+***_ +14 more
+** Autodiscovery
+*** Auto-Discovery — HistoryManager
+*** Auto-Discovery — AgentManager
+*** Auto-Discovery — SkillManager
+*** Auto-Discovery — ToolManager
+** Config As Code
+*** Config-as-Code — ProjectContextConfig
+*** Config-as-Code — SessionLoggingConfig
+*** Config-as-Code — ProviderConfig
+*** Config-as-Code — ModelConfig
+*** Config-as-Code — VibeConfig
+*** Config-as-Code — GitRepoConfig
+***_ +14 more
+@endmindmap

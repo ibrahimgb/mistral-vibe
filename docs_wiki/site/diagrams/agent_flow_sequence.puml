@@ -1,0 +1,37 @@
+@startuml
+!theme plain
+title "Agent Loop — Message Flow"
+
+actor User
+participant "VibeApp\n(TUI)" as TUI
+participant "AgentLoop" as Agent
+participant "LLMBackend" as LLM
+participant "ToolManager" as Tools
+participant "SessionLogger" as Session
+
+User -> TUI : type message
+TUI -> Agent : act(user_message)
+activate Agent
+
+Agent -> Agent : _build_messages()
+Agent -> LLM : chat(messages)
+activate LLM
+LLM --> Agent : stream chunks
+deactivate LLM
+
+alt tool_calls present
+    Agent -> Tools : invoke(tool_call)
+    activate Tools
+    Tools --> Agent : tool_result
+    deactivate Tools
+    Agent -> Agent : _conversation_loop()
+    Agent -> LLM : chat(messages + tool_result)
+    LLM --> Agent : final response
+end
+
+Agent -> Session : log_turn()
+Agent --> TUI : stream response
+deactivate Agent
+TUI --> User : render markdown
+
+@enduml

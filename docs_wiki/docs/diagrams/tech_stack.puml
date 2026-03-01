@@ -1,0 +1,54 @@
+@startuml
+!theme plain
+title "Technology Stack — mistral-vibe"
+
+skinparam componentStyle rectangle
+
+package "Presentation Layer" {
+  [Textual TUI] as tui
+  [Rich Formatting] as rich
+  [Prompt Toolkit] as pt
+}
+
+package "Application Layer" {
+  [Agent Loop] as agent
+  [Command System] as cmds
+  [Skill Manager] as skills
+}
+
+package "Domain Layer" {
+  [LLM Backends] as llm
+  [Tool System] as tools
+  [Session Manager] as session
+  [Middleware Pipeline] as mw
+}
+
+package "Infrastructure Layer" {
+  [httpx (HTTP)] as httpx
+  [MCP Protocol] as mcp
+  [tree-sitter (parsing)] as ts
+  [Pydantic (validation)] as pyd
+}
+
+package "External Services" {
+  [Mistral AI API] as mistral_api
+  [Anthropic API] as anthropic_api
+  [MCP Servers] as mcp_srv
+}
+
+tui --> agent
+rich --> agent
+cmds --> agent
+agent --> llm
+agent --> tools
+agent --> session
+agent --> mw
+llm --> httpx
+tools --> mcp
+tools --> ts
+agent --> pyd
+httpx --> mistral_api
+httpx --> anthropic_api
+mcp --> mcp_srv
+
+@enduml

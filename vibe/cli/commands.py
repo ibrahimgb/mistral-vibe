@@ -77,6 +77,11 @@ class CommandRegistry:
                 description="Browse and resume past sessions",
                 handler="_show_session_picker",
             ),
+            "wiki": Command(
+                aliases=frozenset(["/wiki"]),
+                description="Build & serve the project Code Wiki",
+                handler="_wiki_command",
+            ),
         }
 
         for command in excluded_commands:

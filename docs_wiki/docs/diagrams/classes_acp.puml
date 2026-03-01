@@ -1,0 +1,123 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — acp"
+
+class "AcpSessionLoop" <<Pydantic>> {
+  +model_config
+  +id
+  +agent_loop
+  +task
+}
+
+class "VibeAcpAgentLoop" {
+  +client
+  +__init__()
+  +initialize()
+  +authenticate()
+  +new_session()
+  +load_session()
+  +set_session_mode()
+  +set_session_model()
+  +set_config_option()
+  .. +22 more ..
+}
+
+class "JsonLineFormatter" {
+  +format()
+}
+
+class "Arguments" <<dataclass>> {
+  +setup
+}
+
+abstract class "ToolCallSessionUpdateProtocol" <<Protocol>> {
+  {static} +tool_call_session_update()
+}
+
+abstract class "ToolResultSessionUpdateProtocol" <<Protocol>> {
+  {static} +tool_result_session_update()
+}
+
+class "AcpToolState" <<Pydantic>> {
+  +model_config
+  +client
+  +session_id
+  +tool_call_id
+}
+
+class "BaseAcpTool" {
+  +state
+  {static} +get_tool_instance()
+  {static} +update_tool_state()
+}
+
+class "AcpBashState" <<Pydantic>> {
+}
+
+class "Bash" {
+  +prompt_path
+  +state
+  +run()
+  {static} +get_summary()
+  {static} +tool_call_session_update()
+  {static} +tool_result_session_update()
+}
+
+class "AcpReadFileState" <<Pydantic>> {
+}
+
+class "ReadFile" {
+  +state
+  +prompt_path
+}
+
+class "AcpSearchReplaceState" <<Pydantic>> {
+  +file_backup_content
+}
+
+class "SearchReplace" {
+  +state
+  +prompt_path
+  {static} +tool_call_session_update()
+  {static} +tool_result_session_update()
+}
+
+class "AcpTodoState" {
+}
+
+class "Todo" {
+  +state
+  +prompt_path
+  {static} +tool_call_session_update()
+  {static} +tool_result_session_update()
+}
+
+class "AcpWriteFileState" <<Pydantic>> {
+}
+
+class "WriteFile" {
+  +state
+  +prompt_path
+  {static} +tool_call_session_update()
+  {static} +tool_result_session_update()
+}
+
+enum "ToolOption" <<Enum>> {
+  +ALLOW_ONCE
+  +ALLOW_ALWAYS
+  +REJECT_ONCE
+  +REJECT_ALWAYS
+}
+
+"AcpToolState" <|-- "AcpBashState"
+"BaseAcpTool" <|-- "Bash"
+"AcpToolState" <|-- "AcpReadFileState"
+"BaseAcpTool" <|-- "ReadFile"
+"AcpToolState" <|-- "AcpSearchReplaceState"
+"BaseAcpTool" <|-- "SearchReplace"
+"AcpToolState" <|-- "AcpTodoState"
+"BaseAcpTool" <|-- "Todo"
+"AcpToolState" <|-- "AcpWriteFileState"
+"BaseAcpTool" <|-- "WriteFile"
+@enduml

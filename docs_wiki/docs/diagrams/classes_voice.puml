@@ -1,0 +1,14 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+title "Class Diagram — voice"
+
+class "AudioRecorder" {
+  +__init__()
+  +is_recording()
+  +get_levels()
+  +start()
+  +stop()
+}
+
+@enduml
