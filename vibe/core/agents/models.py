@@ -35,6 +35,7 @@ class AgentType(StrEnum):
 class BuiltinAgentName(StrEnum):
     DEFAULT = "default"
     CHAT = "chat"
+    DEBUG = "debug"
     PLAN = "plan"
     ACCEPT_EDITS = "accept-edits"
     AUTO_APPROVE = "auto-approve"
@@ -113,6 +114,14 @@ AUTO_APPROVE = AgentProfile(
     overrides={"auto_approve": True},
 )
 
+DEBUG = AgentProfile(
+    BuiltinAgentName.DEBUG,
+    "Debug",
+    "Systematic debugging with hypothesis-driven diagnosis",
+    AgentSafety.NEUTRAL,
+    overrides={"system_prompt_id": "debug"},
+)
+
 EXPLORE = AgentProfile(
     name=BuiltinAgentName.EXPLORE,
     display_name="Explore",
@@ -125,6 +134,7 @@ EXPLORE = AgentProfile(
 BUILTIN_AGENTS: dict[str, AgentProfile] = {
     BuiltinAgentName.DEFAULT: DEFAULT,
     BuiltinAgentName.PLAN: PLAN,
+    BuiltinAgentName.DEBUG: DEBUG,
     BuiltinAgentName.ACCEPT_EDITS: ACCEPT_EDITS,
     BuiltinAgentName.AUTO_APPROVE: AUTO_APPROVE,
     BuiltinAgentName.EXPLORE: EXPLORE,

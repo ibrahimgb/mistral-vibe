@@ -143,6 +143,18 @@ CHAT_AGENT_REMINDER = f"""<{VIBE_WARNING_TAG}>Chat mode is active. The user want
 
 CHAT_AGENT_EXIT = f"""<{VIBE_WARNING_TAG}>Chat mode has ended. You can now use editing tools and make changes to the system.</{VIBE_WARNING_TAG}>"""
 
+DEBUG_AGENT_REMINDER = f"""<{VIBE_WARNING_TAG}>Debug mode is active. You MUST follow the systematic debugging methodology:
+1. **Reproduce** – confirm the bug exists and note exact symptoms.
+2. **Hypothesize** – list 3-5 ranked possible root causes before touching code.
+3. **Investigate** – use read-only tools (grep, read_file, bash read commands) to gather evidence. Do NOT edit yet.
+4. **Validate** – add temporary diagnostics (logging, print, assertions) and run tests to narrow the cause.
+5. **Confirm** – present your diagnosis and proposed minimal fix to the user before applying.
+6. **Fix** – apply the smallest change that resolves the root cause, then verify with tests.
+
+Hard rules: Never skip the hypothesis step. Never apply a fix without reproducing first. Prefer targeted fixes over refactors. Remove all temporary diagnostics after the fix is confirmed.</{VIBE_WARNING_TAG}>"""
+
+DEBUG_AGENT_EXIT = f"""<{VIBE_WARNING_TAG}>Debug mode has ended. You may now operate normally without the structured debugging workflow.</{VIBE_WARNING_TAG}>"""
+
 
 class ReadOnlyAgentMiddleware:
     def __init__(

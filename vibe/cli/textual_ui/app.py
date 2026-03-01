@@ -1787,7 +1787,7 @@ class VibeApp(App):  # noqa: PLR0904
 
     def _update_profile_widgets(self, profile: AgentProfile) -> None:
         if self._chat_input_container:
-            self._chat_input_container.set_safety(profile.safety)
+            self._chat_input_container.set_safety(profile.safety, agent_name=profile.name)
             self._chat_input_container.set_agent_name(profile.display_name.lower())
 
     async def _cycle_agent(self) -> None:

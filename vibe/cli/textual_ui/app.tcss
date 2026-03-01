@@ -112,6 +112,11 @@ TextArea > .text-area--cursor {
         border: solid ansi_red;
         border-title-color: ansi_red;
     }
+
+    &.border-debug {
+        border: solid orange;
+        border-title-color: orange;
+    }
 }
 
 #input-body {

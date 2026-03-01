@@ -164,6 +164,7 @@ class TestAgentProfile:
         assert set(agents) == {
             BuiltinAgentName.DEFAULT,
             BuiltinAgentName.PLAN,
+            BuiltinAgentName.DEBUG,
             BuiltinAgentName.ACCEPT_EDITS,
             BuiltinAgentName.AUTO_APPROVE,
         }
@@ -254,10 +255,11 @@ class TestAgentManagerCycling:
             config=base_config, agent_name=BuiltinAgentName.DEFAULT, backend=backend
         )
         order = agent.agent_manager.get_agent_order()
-        assert len(order) == 4
+        assert len(order) == 5
         assert BuiltinAgentName.DEFAULT in order
         assert BuiltinAgentName.AUTO_APPROVE in order
         assert BuiltinAgentName.PLAN in order
+        assert BuiltinAgentName.DEBUG in order
         assert BuiltinAgentName.ACCEPT_EDITS in order
 
     def test_next_agent_cycles_through_all(
@@ -617,3 +619,63 @@ class TestAgentLoopInitialization:
             f"System message should contain custom prompt content. "
             f"Expected '{custom_prompt_content}' to be in system message."
         )
+
+
+class TestDebugAgent:
+    def test_debug_agent_in_builtin_agents(self) -> None:
+        assert BuiltinAgentName.DEBUG in BUILTIN_AGENTS
+
+    def test_debug_agent_is_neutral_safety(self) -> None:
+        assert BUILTIN_AGENTS[BuiltinAgentName.DEBUG].safety == AgentSafety.NEUTRAL
+
+    def test_debug_agent_uses_debug_prompt(self) -> None:
+        overrides = BUILTIN_AGENTS[BuiltinAgentName.DEBUG].overrides
+        assert overrides.get("system_prompt_id") == "debug"
+
+    def test_debug_agent_is_agent_type(self) -> None:
+        assert (
+            BUILTIN_AGENTS[BuiltinAgentName.DEBUG].agent_type == AgentType.AGENT
+        )
+
+    def test_debug_agent_display_name(self) -> None:
+        assert BUILTIN_AGENTS[BuiltinAgentName.DEBUG].display_name == "Debug"
+
+    def test_debug_agent_in_cycle_order(self) -> None:
+        config = build_test_vibe_config(
+            auto_compact_threshold=0,
+            include_project_context=False,
+            include_prompt_detail=False,
+        )
+        backend = FakeBackend([
+            LLMChunk(
+                message=LLMMessage(role=Role.assistant, content="Test"),
+                usage=LLMUsage(prompt_tokens=10, completion_tokens=5),
+            )
+        ])
+        agent = build_test_agent_loop(
+            config=config, agent_name=BuiltinAgentName.DEFAULT, backend=backend
+        )
+        order = agent.agent_manager.get_agent_order()
+        debug_idx = order.index(BuiltinAgentName.DEBUG)
+        plan_idx = order.index(BuiltinAgentName.PLAN)
+        accept_idx = order.index(BuiltinAgentName.ACCEPT_EDITS)
+        assert plan_idx < debug_idx < accept_idx
+
+    @pytest.mark.asyncio
+    async def test_switch_to_debug_agent_keeps_all_tools(self) -> None:
+        backend = FakeBackend([])
+        config = build_test_vibe_config(
+            auto_compact_threshold=0,
+            include_project_context=False,
+            include_prompt_detail=False,
+        )
+        agent = build_test_agent_loop(
+            config=config, agent_name=BuiltinAgentName.DEFAULT, backend=backend
+        )
+        default_tools = set(agent.tool_manager.available_tools.keys())
+
+        await agent.switch_agent(BuiltinAgentName.DEBUG)
+
+        debug_tools = set(agent.tool_manager.available_tools.keys())
+        assert debug_tools == default_tools
+        assert agent.agent_profile.name == BuiltinAgentName.DEBUG

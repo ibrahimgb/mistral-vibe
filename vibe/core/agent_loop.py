@@ -29,6 +29,8 @@ from vibe.core.llm.types import BackendLike
 from vibe.core.middleware import (
     CHAT_AGENT_EXIT,
     CHAT_AGENT_REMINDER,
+    DEBUG_AGENT_EXIT,
+    DEBUG_AGENT_REMINDER,
     PLAN_AGENT_EXIT,
     PLAN_AGENT_REMINDER,
     AutoCompactMiddleware,
@@ -366,6 +368,14 @@ class AgentLoop:
                 BuiltinAgentName.CHAT,
                 CHAT_AGENT_REMINDER,
                 CHAT_AGENT_EXIT,
+            )
+        )
+        self.middleware_pipeline.add(
+            ReadOnlyAgentMiddleware(
+                lambda: self.agent_profile,
+                BuiltinAgentName.DEBUG,
+                DEBUG_AGENT_REMINDER,
+                DEBUG_AGENT_EXIT,
             )
         )
 

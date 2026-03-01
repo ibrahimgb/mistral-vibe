@@ -148,6 +148,7 @@ class AgentManager:
         builtin_order: list[str] = [
             BuiltinAgentName.DEFAULT,
             BuiltinAgentName.PLAN,
+            BuiltinAgentName.DEBUG,
             BuiltinAgentName.ACCEPT_EDITS,
             BuiltinAgentName.AUTO_APPROVE,
         ]

@@ -18,12 +18,17 @@ from vibe.cli.textual_ui.widgets.chat_input.completion_manager import (
 from vibe.cli.textual_ui.widgets.chat_input.completion_popup import CompletionPopup
 from vibe.cli.textual_ui.widgets.chat_input.text_area import ChatTextArea
 from vibe.core.agents import AgentSafety
+from vibe.core.agents.models import BuiltinAgentName
 from vibe.core.autocompletion.completers import CommandCompleter, PathCompleter
 
 SAFETY_BORDER_CLASSES: dict[AgentSafety, str] = {
     AgentSafety.SAFE: "border-safe",
     AgentSafety.DESTRUCTIVE: "border-warning",
     AgentSafety.YOLO: "border-error",
+}
+
+AGENT_BORDER_CLASSES: dict[str, str] = {
+    BuiltinAgentName.DEBUG: "border-debug",
 }
 
 
@@ -189,7 +194,7 @@ class ChatInputContainer(Vertical):
         if self._body:
             self._body.switching_mode = value
 
-    def set_safety(self, safety: AgentSafety) -> None:
+    def set_safety(self, safety: AgentSafety, agent_name: str = "") -> None:
         self._safety = safety
 
         try:
@@ -199,8 +204,12 @@ class ChatInputContainer(Vertical):
 
         for border_class in SAFETY_BORDER_CLASSES.values():
             input_box.remove_class(border_class)
+        for border_class in AGENT_BORDER_CLASSES.values():
+            input_box.remove_class(border_class)
 
-        if safety in SAFETY_BORDER_CLASSES:
+        if agent_name in AGENT_BORDER_CLASSES:
+            input_box.add_class(AGENT_BORDER_CLASSES[agent_name])
+        elif safety in SAFETY_BORDER_CLASSES:
             input_box.add_class(SAFETY_BORDER_CLASSES[safety])
 
     def set_agent_name(self, name: str) -> None:
