@@ -9,6 +9,7 @@ class Command:
     description: str
     handler: str
     exits: bool = False
+    no_interrupt: bool = False
 
 
 class CommandRegistry:
@@ -82,6 +83,24 @@ class CommandRegistry:
                 description="Build & serve the project Code Wiki",
                 handler="_wiki_command",
             ),
+            "new": Command(
+                aliases=frozenset(["/new"]),
+                description="Create a new parallel session",
+                handler="_new_session",
+                no_interrupt=True,
+            ),
+            "sessions": Command(
+                aliases=frozenset(["/sessions"]),
+                description="List all active sessions",
+                handler="_list_sessions",
+                no_interrupt=True,
+            ),
+            "switch": Command(
+                aliases=frozenset(["/switch"]),
+                description="Switch to another session (use /sessions to see IDs)",
+                handler="_switch_session_command",
+                no_interrupt=True,
+            ),
         }
 
         for command in excluded_commands:
@@ -92,12 +111,26 @@ class CommandRegistry:
             for alias in cmd.aliases:
                 self._alias_map[alias] = cmd_name
 
+    @staticmethod
+    def _parse_input(user_input: str) -> tuple[str, str]:
+        """Split user input into (command, args) on the first whitespace."""
+        parts = user_input.strip().split(None, 1)
+        if not parts:
+            return ("", "")
+        return (parts[0].lower(), parts[1] if len(parts) > 1 else "")
+
     def find_command(self, user_input: str) -> Command | None:
         cmd_name = self.get_command_name(user_input)
         return self.commands.get(cmd_name) if cmd_name else None
 
     def get_command_name(self, user_input: str) -> str | None:
-        return self._alias_map.get(user_input.lower().strip())
+        cmd_part, _ = self._parse_input(user_input)
+        return self._alias_map.get(cmd_part)
+
+    def get_command_args(self, user_input: str) -> str:
+        """Return the argument portion after the command keyword."""
+        _, args = self._parse_input(user_input)
+        return args
 
     def get_help_text(self) -> str:
         lines: list[str] = [

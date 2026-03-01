@@ -23,7 +23,7 @@ The `print` statement includes a very long line of Lorem Ipsum text to demonstra
     async def run_before(pilot: Pilot) -> None:
         app = pilot.app
         assistant_message = AssistantMessage(assistant_message_md)
-        messages_area = app.query_one("#messages")
+        messages_area = app.query_one(".messages-container")
         await messages_area.mount(assistant_message)
         await assistant_message.write_initial_content()
         await pilot.pause(0.1)

@@ -188,7 +188,7 @@ async def test_ui_rebuilds_history_when_whats_new_is_shown(
             whats_new_message = app.query_one(WhatsNewMessage)
             message = app.query_one(UserMessage)
             assistant_message = app.query_one(AssistantMessage)
-            messages_area = app.query_one("#messages")
+            messages_area = app.query_one(".messages-container")
             children = list(messages_area.children)
 
     assert message._content == "Hello from the previous session."

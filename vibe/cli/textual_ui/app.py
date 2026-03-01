@@ -38,6 +38,7 @@ from vibe.cli.textual_ui.notifications import (
     NotificationPort,
     TextualNotificationAdapter,
 )
+from vibe.cli.textual_ui.session_manager import SessionManager, SessionState
 from vibe.cli.textual_ui.widgets.approval_app import ApprovalApp
 from vibe.cli.textual_ui.widgets.banner.banner import Banner
 from vibe.cli.textual_ui.widgets.chat_input import ChatInputContainer
@@ -61,6 +62,7 @@ from vibe.cli.textual_ui.widgets.path_display import PathDisplay
 from vibe.cli.textual_ui.widgets.proxy_setup_app import ProxySetupApp
 from vibe.cli.textual_ui.widgets.question_app import QuestionApp
 from vibe.cli.textual_ui.widgets.session_picker import SessionPickerApp
+from vibe.cli.textual_ui.widgets.session_tab_bar import SessionTab, SessionTabBar
 from vibe.cli.textual_ui.widgets.teleport_message import TeleportMessage
 from vibe.cli.textual_ui.widgets.tools import ToolResultMessage
 from vibe.cli.textual_ui.windowing import (
@@ -226,21 +228,21 @@ class VibeApp(App):  # noqa: PLR0904
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
-        self.agent_loop = agent_loop
+
+        # Session management — wrap the initial agent_loop in a SessionState
+        self.session_manager = SessionManager()
+        initial_session = SessionState(
+            session_id=agent_loop.session_id[:8],
+            agent_loop=agent_loop,
+            label="Session 1",
+        )
+        self.session_manager.add_session(initial_session)
+
         self._terminal_notifier = terminal_notifier or TextualNotificationAdapter(
             self,
             get_enabled=lambda: self.config.enable_notifications,
             default_title="Vibe",
         )
-        self._agent_running = False
-        self._interrupt_requested = False
-        self._agent_task: asyncio.Task | None = None
-
-        self._loading_widget: LoadingWidget | None = None
-        self._pending_approval: asyncio.Future | None = None
-        self._pending_question: asyncio.Future | None = None
-
-        self.event_handler: EventHandler | None = None
 
         excluded_commands = []
         if not self.config.nuage_enabled:
@@ -253,12 +255,7 @@ class VibeApp(App):  # noqa: PLR0904
         self.history_file = HISTORY_FILE.path
 
         self._tools_collapsed = True
-        self._windowing = SessionWindowing(load_more_batch_size=LOAD_MORE_BATCH_SIZE)
         self._load_more = HistoryLoadMoreManager()
-        self._tool_call_map: dict[str, str] | None = None
-        self._history_widget_indices: WeakKeyDictionary[Widget, int] = (
-            WeakKeyDictionary()
-        )
         self._update_notifier = update_notifier
         self._update_cache_repository = update_cache_repository
         self._current_version = current_version
@@ -268,20 +265,153 @@ class VibeApp(App):  # noqa: PLR0904
         self._last_escape_time: float | None = None
         self._banner: Banner | None = None
         self._whats_new_message: WhatsNewMessage | None = None
-        self._cached_messages_area: Widget | None = None
         self._cached_chat: ChatScroll | None = None
         self._cached_loading_area: Widget | None = None
         self._switch_agent_generation = 0
+        self._session_tab_bar: SessionTabBar | None = None
+
+    @property
+    def agent_loop(self) -> AgentLoop:
+        """Active session's AgentLoop. Keeps existing code compatible."""
+        session = self.session_manager.active_session
+        if session is None:
+            msg = "No active session"
+            raise RuntimeError(msg)
+        return session.agent_loop
+
+    @property
+    def _active(self) -> SessionState:
+        """Shorthand for the active session state."""
+        session = self.session_manager.active_session
+        if session is None:
+            msg = "No active session"
+            raise RuntimeError(msg)
+        return session
+
+    @property
+    def _agent_running(self) -> bool:
+        return self._active.agent_running
+
+    @_agent_running.setter
+    def _agent_running(self, value: bool) -> None:
+        self._active.agent_running = value
+        self._refresh_tab_bar()
+
+    @property
+    def _interrupt_requested(self) -> bool:
+        return self._active.interrupt_requested
+
+    @_interrupt_requested.setter
+    def _interrupt_requested(self, value: bool) -> None:
+        self._active.interrupt_requested = value
+
+    @property
+    def _agent_task(self) -> asyncio.Task[None] | None:
+        return self._active.agent_task
+
+    @_agent_task.setter
+    def _agent_task(self, value: asyncio.Task[None] | None) -> None:
+        self._active.agent_task = value
+
+    @property
+    def _loading_widget(self) -> LoadingWidget | None:
+        return self._active.loading_widget
+
+    @_loading_widget.setter
+    def _loading_widget(self, value: LoadingWidget | None) -> None:
+        self._active.loading_widget = value
+
+    @property
+    def _pending_approval(self) -> asyncio.Future | None:
+        return self._active.pending_approval
+
+    @_pending_approval.setter
+    def _pending_approval(self, value: asyncio.Future | None) -> None:
+        self._active.pending_approval = value
+
+    @property
+    def _pending_question(self) -> asyncio.Future | None:
+        return self._active.pending_question
+
+    @_pending_question.setter
+    def _pending_question(self, value: asyncio.Future | None) -> None:
+        self._active.pending_question = value
+
+    @property
+    def event_handler(self) -> EventHandler | None:
+        return self._active.event_handler
+
+    @event_handler.setter
+    def event_handler(self, value: EventHandler | None) -> None:
+        self._active.event_handler = value
+
+    @property
+    def _windowing(self) -> SessionWindowing:
+        return self._active.windowing
+
+    @property
+    def _tool_call_map(self) -> dict[str, str] | None:
+        return self._active.tool_call_map
+
+    @_tool_call_map.setter
+    def _tool_call_map(self, value: dict[str, str] | None) -> None:
+        self._active.tool_call_map = value
+
+    @property
+    def _history_widget_indices(self) -> WeakKeyDictionary[Widget, int]:
+        return self._active.history_widget_indices
+
+    @_history_widget_indices.setter
+    def _history_widget_indices(self, value: WeakKeyDictionary[Widget, int]) -> None:
+        self._active.history_widget_indices = value
+
+    @property
+    def _cached_messages_area(self) -> Widget | None:
+        """Return the messages area for the active session."""
+        try:
+            return self.query_one(f"#{self._active.messages_container_id}")
+        except Exception:
+            return None
+
+    @property
+    def _last_mounted_user_message(self) -> Any:
+        return self._active.last_mounted_user_message
+
+    @_last_mounted_user_message.setter
+    def _last_mounted_user_message(self, value: Any) -> None:
+        self._active.last_mounted_user_message = value
 
     @property
     def config(self) -> VibeConfig:
         return self.agent_loop.config
 
+    def _refresh_tab_bar(self) -> None:
+        """Update the session tab bar to reflect current sessions."""
+        if self._session_tab_bar is not None:
+            self._session_tab_bar.update_sessions(
+                self.session_manager.list_sessions(),
+                self.session_manager.active_id,
+            )
+
+    def _make_event_handler(self, session: SessionState) -> EventHandler:
+        """Create an EventHandler whose mount callback targets *this* session."""
+        async def _session_mount(widget: Widget, after: Widget | None = None) -> None:
+            await self._mount_and_scroll_for_session(session, widget, after=after)
+
+        return EventHandler(
+            mount_callback=_session_mount,
+            get_tools_collapsed=lambda: self._tools_collapsed,
+            on_user_message_id=self._patch_user_message_id,
+        )
+
     def compose(self) -> ComposeResult:
+        self._session_tab_bar = SessionTabBar()
+        yield self._session_tab_bar
+
         with ChatScroll(id="chat"):
             self._banner = Banner(self.config, self.agent_loop.skill_manager)
             yield self._banner
-            yield VerticalGroup(id="messages")
+            yield VerticalGroup(id=self._active.messages_container_id, classes="messages-container")
 
         with Horizontal(id="loading-area"):
             yield Static(id="loading-area-content")
@@ -307,16 +437,10 @@ class VibeApp(App):  # noqa: PLR0904
         self.theme = "textual-ansi"
         self._terminal_notifier.restore()
 
-        self._cached_messages_area = self.query_one("#messages")
         self._cached_chat = self.query_one("#chat", ChatScroll)
         self._cached_loading_area = self.query_one("#loading-area-content")
-        self._last_mounted_user_message: UserMessage | None = None
 
-        self.event_handler = EventHandler(
-            mount_callback=self._mount_and_scroll,
-            get_tools_collapsed=lambda: self._tools_collapsed,
-            on_user_message_id=self._patch_user_message_id,
-        )
+        self._active.event_handler = self._make_event_handler(self._active)
 
         self._chat_input_container = self.query_one(ChatInputContainer)
         context_progress = self.query_one(ContextProgress)
@@ -377,7 +501,14 @@ class VibeApp(App):  # noqa: PLR0904
         input_widget = self.query_one(ChatInputContainer)
         input_widget.value = ""
 
-        if self._agent_running:
+        # Check if this is a no-interrupt command (e.g. /new, /switch, /sessions)
+        # before interrupting the running agent — those commands should leave
+        # the current session processing in the background.
+        skip_interrupt = False
+        if cmd := self.commands.find_command(value):
+            skip_interrupt = cmd.no_interrupt
+
+        if self._agent_running and not skip_interrupt:
             await self._interrupt_agent_loop()
 
         if value.startswith("!"):
@@ -485,7 +616,7 @@ class VibeApp(App):  # noqa: PLR0904
     async def on_compact_message_completed(
         self, message: CompactMessage.Completed
     ) -> None:
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         children = list(messages_area.children)
 
         try:
@@ -514,11 +645,12 @@ class VibeApp(App):  # noqa: PLR0904
                     cmd_name, "builtin"
                 )
             await self._mount_and_scroll(UserMessage(user_input))
+            args = self.commands.get_command_args(user_input)
             handler = getattr(self, command.handler)
             if asyncio.iscoroutinefunction(handler):
-                await handler()
+                await handler(args) if args else await handler()
             else:
-                handler()
+                handler(args) if args else handler()
             return True
         return False
 
@@ -611,12 +743,10 @@ class VibeApp(App):  # noqa: PLR0904
             self._last_mounted_user_message = None
 
     def _reset_ui_state(self) -> None:
-        self._windowing.reset()
-        self._tool_call_map = None
-        self._history_widget_indices = WeakKeyDictionary()
+        self._active.reset_ui_state()
 
     async def _resume_history_from_messages(self) -> None:
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         if not should_resume_history(list(messages_area.children)):
             return
 
@@ -703,38 +833,70 @@ class VibeApp(App):  # noqa: PLR0904
         self._pending_question = None
         return result
 
+    async def _mount_and_scroll_for_session(
+        self, session: SessionState, widget: Widget, after: Widget | None = None
+    ) -> None:
+        """Mount a widget into a specific session's container (even if not active)."""
+        try:
+            messages_area = self.query_one(f"#{session.messages_container_id}")
+        except Exception:
+            return
+        chat = self._cached_chat or self.query_one("#chat", ChatScroll)
+
+        is_user_initiated = isinstance(widget, (UserMessage, UserCommandMessage))
+        should_anchor = is_user_initiated or chat.is_at_bottom
+
+        if after is not None and after.parent is messages_area:
+            await messages_area.mount(widget, after=after)
+        else:
+            await messages_area.mount(widget)
+        if isinstance(widget, StreamingMessageBase):
+            await widget.write_initial_content()
+
+        # Only anchor/prune if this session is the currently visible one
+        if session.session_id == self.session_manager.active_id:
+            self.call_after_refresh(self._try_prune)
+            if should_anchor:
+                chat.anchor()
+
     async def _handle_agent_loop_turn(self, prompt: str) -> None:
-        self._agent_running = True
+        # Capture the session that owns this turn so property delegation
+        # to self._active cannot redirect output to a different session
+        # after the user switches with /new or /switch.
+        session = self._active
+
+        session.agent_running = True
+        self._refresh_tab_bar()
 
         loading_area = self._cached_loading_area or self.query_one(
             "#loading-area-content"
         )
 
         loading = LoadingWidget()
-        self._loading_widget = loading
+        session.loading_widget = loading
         await loading_area.mount(loading)
 
         try:
             rendered_prompt = render_path_prompt(prompt, base_dir=Path.cwd())
-            async for event in self.agent_loop.act(rendered_prompt):
-                if self.event_handler:
-                    await self.event_handler.handle_event(
+            async for event in session.agent_loop.act(rendered_prompt):
+                if session.event_handler:
+                    await session.event_handler.handle_event(
                         event,
-                        loading_active=self._loading_widget is not None,
-                        loading_widget=self._loading_widget,
+                        loading_active=session.loading_widget is not None,
+                        loading_widget=session.loading_widget,
                     )
 
         except asyncio.CancelledError:
-            if self._loading_widget and self._loading_widget.parent:
-                await self._loading_widget.remove()
-            if self.event_handler:
-                self.event_handler.stop_current_tool_call(success=False)
+            if session.loading_widget and session.loading_widget.parent:
+                await session.loading_widget.remove()
+            if session.event_handler:
+                session.event_handler.stop_current_tool_call(success=False)
             raise
         except Exception as e:
-            if self._loading_widget and self._loading_widget.parent:
-                await self._loading_widget.remove()
-            if self.event_handler:
-                self.event_handler.stop_current_tool_call(success=False)
+            if session.loading_widget and session.loading_widget.parent:
+                await session.loading_widget.remove()
+            if session.event_handler:
+                session.event_handler.stop_current_tool_call(success=False)
 
             message = str(e)
             if isinstance(e, RateLimitError):
@@ -743,19 +905,22 @@ class VibeApp(App):  # noqa: PLR0904
                 else:
                     message = "Rate limits exceeded. Please wait a moment before trying again."
 
-            await self._mount_and_scroll(
-                ErrorMessage(message, collapsed=self._tools_collapsed)
+            await self._mount_and_scroll_for_session(
+                session, ErrorMessage(message, collapsed=self._tools_collapsed)
             )
         finally:
-            self._agent_running = False
-            self._interrupt_requested = False
-            self._agent_task = None
-            if self._loading_widget:
-                await self._loading_widget.remove()
-            self._loading_widget = None
-            if self.event_handler:
-                await self.event_handler.finalize_streaming()
-            await self._refresh_windowing_from_history()
+            session.agent_running = False
+            session.interrupt_requested = False
+            session.agent_task = None
+            if session.loading_widget:
+                await session.loading_widget.remove()
+            session.loading_widget = None
+            if session.event_handler:
+                await session.event_handler.finalize_streaming()
+            # Only refresh windowing if this session is still active
+            if session.session_id == self.session_manager.active_id:
+                await self._refresh_windowing_from_history()
+            self._refresh_tab_bar()
             self._terminal_notifier.notify(NotificationContext.COMPLETE)
 
     async def _teleport_command(self) -> None:
@@ -1006,7 +1171,7 @@ class VibeApp(App):  # noqa: PLR0904
             self._reset_ui_state()
             await self._load_more.hide()
 
-            messages_area = self._cached_messages_area or self.query_one("#messages")
+            messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
             await messages_area.remove_children()
 
             await self._resume_history_from_messages()
@@ -1028,6 +1193,148 @@ class VibeApp(App):  # noqa: PLR0904
         await self._switch_to_input_app()
 
         await self._mount_and_scroll(UserCommandMessage("Resume cancelled."))
+
+    # ── Multi-session commands ───────────────────────────────────────
+
+    async def _new_session(self) -> None:
+        """Create a new parallel session with a fresh AgentLoop."""
+        import functools
+
+        from vibe.core.agent_loop import AgentLoop as _AgentLoop
+
+        old = self._active
+        base_config = old.agent_loop._base_config
+        agent_name = old.agent_loop.agent_profile.name
+        enable_streaming = old.agent_loop.enable_streaming
+
+        # AgentLoop.__init__ does heavy sync I/O (filesystem walk, git subprocess
+        # calls, dynamic imports).  Offload to a thread so the Textual event-loop
+        # stays responsive.
+        loop = asyncio.get_running_loop()
+        new_loop = await loop.run_in_executor(
+            None,
+            functools.partial(
+                _AgentLoop,
+                config=base_config,
+                agent_name=agent_name,
+                enable_streaming=enable_streaming,
+            ),
+        )
+
+        idx = self.session_manager.session_count + 1
+        session = SessionState(
+            session_id=new_loop.session_id[:8],
+            agent_loop=new_loop,
+            label=f"Session {idx}",
+        )
+        self.session_manager.add_session(session)
+        await self._switch_session(session.session_id)
+
+        await self._mount_and_scroll(
+            UserCommandMessage(f"New session **{session.label}** (`{session.session_id}`) created.")
+        )
+
+    async def _list_sessions(self) -> None:
+        """Display all active sessions."""
+        sessions = self.session_manager.list_sessions()
+        lines = ["## Active Sessions\n"]
+        for i, s in enumerate(sessions, 1):
+            active = " **(active)**" if s.session_id == self.session_manager.active_id else ""
+            running = " _(running)_" if s.agent_running else ""
+            label = s.label or f"Session {i}"
+            lines.append(f"- `{s.session_id}` — {label}{active}{running}")
+        lines.append(f"\nUse `/switch <id>` to switch sessions.")
+        await self._mount_and_scroll(UserCommandMessage("\n".join(lines)))
+
+    async def _switch_session_command(self, args: str = "") -> None:
+        """Handle /switch <session_id> command."""
+        target_id = args.strip()
+        if not target_id:
+            await self._mount_and_scroll(
+                ErrorMessage("Usage: `/switch <session_id>`", collapsed=self._tools_collapsed)
+            )
+            return
+
+        # Allow prefix matching
+        matches = [
+            s for s in self.session_manager.list_sessions()
+            if s.session_id.startswith(target_id)
+        ]
+        if not matches:
+            await self._mount_and_scroll(
+                ErrorMessage(f"No session matching `{target_id}`.", collapsed=self._tools_collapsed)
+            )
+            return
+        if len(matches) > 1:
+            ids = ", ".join(f"`{m.session_id}`" for m in matches)
+            await self._mount_and_scroll(
+                ErrorMessage(f"Ambiguous ID. Matches: {ids}", collapsed=self._tools_collapsed)
+            )
+            return
+
+        await self._switch_session(matches[0].session_id)
+
+    async def _switch_session(self, target_id: str) -> None:
+        """Perform the actual session switch: hide old messages, show new ones."""
+        if target_id == self.session_manager.active_id:
+            return
+
+        old_session = self._active
+
+        # Hide current messages container
+        try:
+            old_container = self.query_one(f"#{old_session.messages_container_id}")
+            old_container.display = False
+        except Exception:
+            pass
+
+        # Switch active session in manager
+        new_session = self.session_manager.switch_to(target_id)
+
+        # Show or create the new session's messages container
+        try:
+            new_container = self.query_one(f"#{new_session.messages_container_id}")
+            new_container.display = True
+        except Exception:
+            # First time — mount a new messages container inside chat scroll
+            chat = self._cached_chat or self.query_one("#chat", ChatScroll)
+            new_container = VerticalGroup(id=new_session.messages_container_id, classes="messages-container")
+            await chat.mount(new_container)
+
+        # Set up event handler if this session hasn't been wired yet
+        if new_session.event_handler is None:
+            new_session.event_handler = self._make_event_handler(new_session)
+
+        # Wire callbacks on the new session's agent loop
+        new_session.agent_loop.set_approval_callback(self._approval_callback)
+        new_session.agent_loop.set_user_input_callback(self._user_input_callback)
+
+        # Update context progress for the new session
+        try:
+            context_progress = self.query_one(ContextProgress)
+
+            def update_context_progress(stats: AgentStats) -> None:
+                context_progress.tokens = TokenState(
+                    max_tokens=self.config.auto_compact_threshold,
+                    current_tokens=stats.context_tokens,
+                )
+
+            new_session.agent_loop.stats.add_listener(
+                "context_tokens", update_context_progress
+            )
+            new_session.agent_loop.stats.trigger_listeners()
+        except Exception:
+            pass
+
+        self._refresh_tab_bar()
+
+        # Scroll to bottom of new session
+        chat = self._cached_chat or self.query_one("#chat", ChatScroll)
+        self.call_after_refresh(chat.anchor)
+
+    async def on_session_tab_clicked(self, event: SessionTab.Clicked) -> None:
+        """Handle clicking a session tab."""
+        await self._switch_session(event.session_id)
 
     async def _reload_config(self) -> None:
         try:
@@ -1053,7 +1360,7 @@ class VibeApp(App):  # noqa: PLR0904
             await self.agent_loop.clear_history()
             if self.event_handler:
                 await self.event_handler.finalize_streaming()
-            messages_area = self._cached_messages_area or self.query_one("#messages")
+            messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
             await messages_area.remove_children()
 
             await messages_area.mount(UserMessage("/clear"))
@@ -1074,7 +1381,7 @@ class VibeApp(App):  # noqa: PLR0904
 
     async def _remove_message_pair_from_ui(self, message_id: str) -> None:
         """Remove a UserMessage widget and its following response widgets from the UI."""
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         children = list(messages_area.children)
 
         source: UserMessage | None = None
@@ -1118,7 +1425,7 @@ class VibeApp(App):  # noqa: PLR0904
     async def action_edit_last_message(self) -> None:
         if self._agent_running:
             return
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         for child in reversed(list(messages_area.children)):
             if isinstance(child, UserMessage) and child.message_id is not None:
                 child.post_message(
@@ -1213,18 +1520,21 @@ class VibeApp(App):  # noqa: PLR0904
         return self.agent_loop.session_logger.session_id[:8]
 
     async def _exit_app(self) -> None:
-        try:
-            title = await self.agent_loop.generate_title()
-            self.agent_loop.session_logger.title_override = title
-            await self.agent_loop.session_logger.save_interaction(
-                self.agent_loop.messages,
-                self.agent_loop.stats,
-                self.agent_loop._base_config,
-                self.agent_loop.tool_manager,
-                self.agent_loop.agent_profile,
-            )
-        except Exception:
-            pass
+        # Save all sessions, not just the active one
+        for session in self.session_manager.list_sessions():
+            try:
+                loop = session.agent_loop
+                title = await loop.generate_title()
+                loop.session_logger.title_override = title
+                await loop.session_logger.save_interaction(
+                    loop.messages,
+                    loop.stats,
+                    loop._base_config,
+                    loop.tool_manager,
+                    loop.agent_profile,
+                )
+            except Exception:
+                pass
 
         self.exit(result=self._get_session_resume_info())
 
@@ -1425,7 +1735,7 @@ class VibeApp(App):  # noqa: PLR0904
             if (batch := self._windowing.next_load_more_batch()) is None:
                 await self._load_more.hide()
                 return
-            messages_area = self._cached_messages_area or self.query_one("#messages")
+            messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
             if self._tool_call_map is None:
                 self._tool_call_map = {}
             if self._load_more.widget:
@@ -1526,12 +1836,14 @@ class VibeApp(App):  # noqa: PLR0904
         self.run_worker(self._force_quit_and_exit(), exclusive=False)
 
     async def _force_quit_and_exit(self) -> None:
-        if self._agent_task and not self._agent_task.done():
-            self._agent_task.cancel()
-            try:
-                await self._agent_task
-            except (asyncio.CancelledError, Exception):
-                pass
+        # Cancel tasks for ALL sessions
+        for session in self.session_manager.list_sessions():
+            if session.agent_task and not session.agent_task.done():
+                session.agent_task.cancel()
+                try:
+                    await session.agent_task
+                except (asyncio.CancelledError, Exception):
+                    pass
         await self._exit_app()
 
     def action_scroll_chat_up(self) -> None:
@@ -1583,7 +1895,7 @@ class VibeApp(App):  # noqa: PLR0904
                 whats_new_message = WhatsNewMessage(f"{content}\n\n{plan_offer}")
             if self._history_widget_indices:
                 whats_new_message.add_class("after-history")
-            messages_area = self._cached_messages_area or self.query_one("#messages")
+            messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
             chat = self._cached_chat or self.query_one("#chat", ChatScroll)
             should_anchor = chat.is_at_bottom
             await chat.mount(whats_new_message, after=messages_area)
@@ -1618,7 +1930,7 @@ class VibeApp(App):  # noqa: PLR0904
     async def _mount_and_scroll(
         self, widget: Widget, after: Widget | None = None
     ) -> None:
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         chat = self._cached_chat or self.query_one("#chat", ChatScroll)
 
         is_user_initiated = isinstance(widget, (UserMessage, UserCommandMessage))
@@ -1636,7 +1948,7 @@ class VibeApp(App):  # noqa: PLR0904
             chat.anchor()
 
     async def _try_prune(self) -> None:
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         pruned = await prune_oldest_children(
             messages_area, PRUNE_LOW_MARK, PRUNE_HIGH_MARK
         )
@@ -1650,7 +1962,7 @@ class VibeApp(App):  # noqa: PLR0904
     async def _refresh_windowing_from_history(self) -> None:
         if self._load_more.widget is None:
             return
-        messages_area = self._cached_messages_area or self.query_one("#messages")
+        messages_area = self._cached_messages_area or self.query_one(f"#{self._active.messages_container_id}")
         has_backfill, tool_call_map = sync_backfill_state(
             history_messages=non_system_history_messages(self.agent_loop.messages),
             messages_children=list(messages_area.children),
