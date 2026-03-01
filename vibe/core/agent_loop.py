@@ -1037,6 +1037,30 @@ class AgentLoop:
             )
             raise
 
+    async def generate_title(self) -> str:
+        """Generate a concise LLM-powered title for the current conversation.
+
+        Uses `messages.silent()` so the title prompt and response are never
+        persisted into conversation history.  Falls back to "Untitled session"
+        on any error.
+        """
+        if not any(m.role != Role.system for m in self.messages):
+            return "Untitled session"
+
+        title_prompt = UtilityPrompt.SESSION_TITLE.read()
+
+        try:
+            with self.messages.silent():
+                self.messages.append(
+                    LLMMessage(role=Role.user, content=title_prompt)
+                )
+                result = await self._chat()
+
+            title = (result.message.content or "").strip().strip('"').strip("'")
+            return title or "Untitled session"
+        except Exception:
+            return "Untitled session"
+
     async def switch_agent(self, agent_name: str) -> None:
         if agent_name == self.agent_profile.name:
             return

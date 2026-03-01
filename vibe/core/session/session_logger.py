@@ -49,6 +49,7 @@ class SessionLogger:
         self.session_prefix = session_config.session_prefix
         self.session_id = session_id
         self.session_start_time = utc_now().isoformat()
+        self.title_override: str | None = None
 
         self.save_dir.mkdir(parents=True, exist_ok=True)
         self.session_dir = self.save_folder
@@ -313,7 +314,7 @@ class SessionLogger:
                 for tool_class in tool_manager.available_tools.values()
             ]
 
-            title = self._get_title(messages)
+            title = self.title_override or self._get_title(messages)
             system_prompt = (
                 messages[0].model_dump()
                 if len(messages) > 0 and messages[0].role == Role.system

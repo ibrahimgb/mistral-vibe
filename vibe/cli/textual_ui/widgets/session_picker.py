@@ -53,7 +53,8 @@ def _build_option_text(session: SessionInfo, message: str) -> Text:
     text.append(f"{time_str:10}", style="dim")
     text.append("  ")
     text.append(f"{session_id}  ", style="dim")
-    text.append(message)
+    title = session.get("title")
+    text.append(title if title else message)
     return text
 
 
