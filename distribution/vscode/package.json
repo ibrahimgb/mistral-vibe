@@ -1,0 +1,120 @@
+{
+  "name": "mistral-vibe",
+  "displayName": "Mistral Vibe",
+  "description": "Mistral's open-source coding assistant — powered by vibe-acp",
+  "version": "0.1.0",
+  "publisher": "mistralai",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mistralai/mistral-vibe"
+  },
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": [
+    "Chat"
+  ],
+  "activationEvents": [
+    "onChatParticipant:mistral-vibe.chat"
+  ],
+  "main": "./out/extension.js",
+  "icon": "icons/mistral_vibe.png",
+  "contributes": {
+    "chatParticipants": [
+      {
+        "id": "mistral-vibe.chat",
+        "fullName": "Mistral Vibe",
+        "name": "vibe",
+        "description": "Mistral's open-source coding assistant",
+        "isSticky": true,
+        "commands": [
+          {
+            "name": "clear",
+            "description": "Clear conversation history"
+          },
+          {
+            "name": "compact",
+            "description": "Compact conversation by summarizing"
+          },
+          {
+            "name": "status",
+            "description": "Show agent stats (tokens, cost, steps)"
+          },
+          {
+            "name": "reload",
+            "description": "Reload configuration from disk"
+          },
+          {
+            "name": "log",
+            "description": "Show session log file path"
+          },
+          {
+            "name": "proxy-setup",
+            "description": "Configure proxy and SSL settings"
+          }
+        ]
+      }
+    ],
+    "commands": [
+      {
+        "command": "mistral-vibe.toggleRecording",
+        "title": "Vibe: Toggle Voice Recording",
+        "icon": "$(mic)"
+      },
+      {
+        "command": "mistral-vibe.newSession",
+        "title": "Vibe: New Session"
+      },
+      {
+        "command": "mistral-vibe.listSessions",
+        "title": "Vibe: Browse Sessions"
+      },
+      {
+        "command": "mistral-vibe.switchMode",
+        "title": "Vibe: Switch Mode"
+      },
+      {
+        "command": "mistral-vibe.switchModel",
+        "title": "Vibe: Switch Model"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "mistral-vibe.toggleRecording",
+        "key": "ctrl+r",
+        "mac": "cmd+r"
+      },
+      {
+        "command": "mistral-vibe.switchMode",
+        "key": "shift+tab"
+      }
+    ],
+    "configuration": {
+      "title": "Mistral Vibe",
+      "properties": {
+        "mistral-vibe.vibeAcpPath": {
+          "type": "string",
+          "default": "vibe-acp",
+          "description": "Path to the vibe-acp binary. Defaults to 'vibe-acp' (assumes it's on PATH)."
+        },
+        "mistral-vibe.mistralApiKey": {
+          "type": "string",
+          "default": "",
+          "description": "Mistral API key for Voxtral audio transcription. Falls back to MISTRAL_API_KEY env var."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.95.0",
+    "typescript": "^5.3.0"
+  }
+}

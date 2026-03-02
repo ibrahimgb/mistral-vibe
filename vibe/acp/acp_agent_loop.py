@@ -384,6 +384,7 @@ class VibeAcpAgentLoop(AcpAgent):
                     )
 
     async def _send_available_commands(self, session_id: str) -> None:
+        session = self._get_session(session_id)
         commands = [
             AvailableCommand(
                 name="proxy-setup",
@@ -393,8 +394,44 @@ class VibeAcpAgentLoop(AcpAgent):
                         hint="KEY value to set, KEY to unset, or empty for help"
                     )
                 ),
-            )
+            ),
+            AvailableCommand(
+                name="clear",
+                description="Clear conversation history",
+                input=None,
+            ),
+            AvailableCommand(
+                name="compact",
+                description="Compact conversation history by summarizing",
+                input=None,
+            ),
+            AvailableCommand(
+                name="status",
+                description="Display agent statistics (tokens, cost, steps)",
+                input=None,
+            ),
+            AvailableCommand(
+                name="reload",
+                description="Reload configuration from disk",
+                input=None,
+            ),
+            AvailableCommand(
+                name="log",
+                description="Show path to current interaction log file",
+                input=None,
+            ),
         ]
+
+        # Register dynamic skill commands
+        for name, info in session.agent_loop.skill_manager.available_skills.items():
+            if info.user_invocable:
+                commands.append(
+                    AvailableCommand(
+                        name=name,
+                        description=info.description or f"Run skill: {name}",
+                        input=None,
+                    )
+                )
 
         update = update_available_commands(commands)
         await self.client.session_update(session_id=session_id, update=update)
@@ -426,6 +463,73 @@ class VibeAcpAgentLoop(AcpAgent):
             ),
         )
         return PromptResponse(stop_reason="end_turn")
+
+    async def _send_message(self, session_id: str, message: str) -> PromptResponse:
+        """Send a text message back to the client and end the turn."""
+        await self.client.session_update(
+            session_id=session_id,
+            update=AgentMessageChunk(
+                session_update="agent_message_chunk",
+                content=TextContentBlock(type="text", text=message),
+            ),
+        )
+        return PromptResponse(stop_reason="end_turn")
+
+    async def _handle_clear_command(self, session: AcpSessionLoop) -> PromptResponse:
+        await session.agent_loop.clear_history()
+        return await self._send_message(session.id, "Conversation history cleared.")
+
+    async def _handle_compact_command(self, session: AcpSessionLoop) -> PromptResponse:
+        if len(session.agent_loop.messages) <= 1:
+            return await self._send_message(session.id, "Nothing to compact — conversation is empty.")
+
+        await self.client.session_update(
+            session_id=session.id,
+            update=create_compact_start_session_update(
+                CompactStartEvent(summary="")
+            ),
+        )
+
+        summary = await session.agent_loop.compact()
+
+        await self.client.session_update(
+            session_id=session.id,
+            update=create_compact_end_session_update(
+                CompactEndEvent(summary=summary)
+            ),
+        )
+        return await self._send_message(session.id, f"Conversation compacted.\n\n**Summary:** {summary}")
+
+    async def _handle_status_command(self, session: AcpSessionLoop) -> PromptResponse:
+        stats = session.agent_loop.stats
+        lines = [
+            "## Agent Status",
+            f"- **Steps:** {stats.steps}",
+            f"- **Prompt tokens:** {stats.session_prompt_tokens:,}",
+            f"- **Completion tokens:** {stats.session_completion_tokens:,}",
+            f"- **Total tokens:** {stats.session_total_llm_tokens:,}",
+            f"- **Context tokens:** {stats.context_tokens:,}",
+            f"- **Last turn tokens:** {stats.last_turn_total_tokens:,}",
+            f"- **Tokens/sec:** {stats.tokens_per_second:.1f}",
+            f"- **Session cost:** ${stats.session_cost:.4f}",
+            f"- **Tool calls:** {stats.tool_calls_succeeded} succeeded, {stats.tool_calls_failed} failed, {stats.tool_calls_rejected} rejected",
+        ]
+        return await self._send_message(session.id, "\n".join(lines))
+
+    async def _handle_reload_command(self, session: AcpSessionLoop) -> PromptResponse:
+        new_config = VibeConfig.load(
+            tool_paths=session.agent_loop.config.tool_paths,
+            disabled_tools=["ask_user_question"],
+        )
+        await session.agent_loop.reload_with_initial_messages(base_config=new_config)
+        return await self._send_message(session.id, "Configuration reloaded from disk.")
+
+    async def _handle_log_command(self, session: AcpSessionLoop) -> PromptResponse:
+        logger = session.agent_loop.session_logger
+        if not logger.enabled:
+            return await self._send_message(session.id, "Session logging is disabled.")
+        session_dir = logger.session_dir
+        return await self._send_message(session.id, f"Session log directory:\n\n`{session_dir}`")
 
     @override
     async def load_session(
@@ -609,8 +713,28 @@ class VibeAcpAgentLoop(AcpAgent):
 
         text_prompt = self._build_text_prompt(prompt)
 
-        if text_prompt.strip().lower().startswith("/proxy-setup"):
-            return await self._handle_proxy_setup_command(session_id, text_prompt)
+        # Dispatch slash commands
+        stripped = text_prompt.strip().lower()
+        match stripped.split()[0] if stripped.startswith("/") else "":
+            case "/proxy-setup":
+                return await self._handle_proxy_setup_command(session_id, text_prompt)
+            case "/clear":
+                return await self._handle_clear_command(session)
+            case "/compact":
+                return await self._handle_compact_command(session)
+            case "/status":
+                return await self._handle_status_command(session)
+            case "/reload":
+                return await self._handle_reload_command(session)
+            case "/log":
+                return await self._handle_log_command(session)
+            case _:
+                # Check for dynamic skill commands
+                if stripped.startswith("/"):
+                    skill_name = stripped.split()[0][1:]  # remove leading /
+                    if skill_info := session.agent_loop.skill_manager.get_skill(skill_name):
+                        skill_content = skill_info.skill_path.read_text(encoding="utf-8")
+                        text_prompt = skill_content
 
         temp_user_message_id: str | None = kwargs.get("messageId")
 
