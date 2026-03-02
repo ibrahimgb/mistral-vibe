@@ -1274,6 +1274,184 @@ class VibeApp(App):  # noqa: PLR0904
 
         await self._switch_session(matches[0].session_id)
 
+    # ------------------------------------------------------------------
+    # /mode command
+    # ------------------------------------------------------------------
+
+    async def _mode_command(self, args: str = "") -> None:
+        """Handle /mode and /mode create commands."""
+        match args.strip().lower():
+            case "create":
+                self.run_worker(self._mode_create(), exclusive=False)
+            case "":
+                await self._mode_list()
+            case other:
+                await self._mount_and_scroll(
+                    ErrorMessage(
+                        f"Unknown sub-command `{other}`. Usage: `/mode` or `/mode create`.",
+                        collapsed=self._tools_collapsed,
+                    )
+                )
+
+    async def _mode_list(self) -> None:
+        """Display all available agent modes."""
+        manager = self.agent_loop.agent_manager
+        active = self.agent_loop.agent_profile
+        lines = ["## Available Modes\n"]
+        for name, profile in manager.available_agents.items():
+            marker = " **(active)**" if name == active.name else ""
+            lines.append(
+                f"- **{profile.display_name}** (`{name}`){marker} — {profile.description or 'no description'}"
+            )
+        lines.append("\nUse `Shift+Tab` to cycle modes, or `/mode create` to add a custom mode.")
+        await self._mount_and_scroll(UserCommandMessage("\n".join(lines)))
+
+    async def _mode_create(self) -> None:
+        """Interactive wizard to create a custom agent mode with a full skill prompt."""
+        from vibe.core.agents.models import AgentSafety
+        from vibe.core.paths.global_paths import GLOBAL_AGENTS_DIR, GLOBAL_PROMPTS_DIR
+
+        # --- Step 1: collect metadata ---
+        result = await self._user_input_callback(
+            AskUserQuestionArgs(
+                questions=[
+                    Question(
+                        question="Name (lowercase slug) — pick one or type your own",
+                        header="Name",
+                        options=[
+                            Choice(label="frontend-expert"),
+                            Choice(label="code-reviewer"),
+                        ],
+                    ),
+                    Question(
+                        question="Safety level for this mode",
+                        header="Safety",
+                        options=[
+                            Choice(label="safe", description="Read-only, no file writes"),
+                            Choice(label="neutral", description="Normal – asks before dangerous ops"),
+                            Choice(label="destructive", description="Can modify files freely"),
+                            Choice(label="yolo", description="Full auto-approve, no confirmations"),
+                        ],
+                        hide_other=True,
+                    ),
+                    Question(
+                        question="Brief description — pick one or type your own",
+                        header="Description",
+                        options=[
+                            Choice(label="Custom coding assistant"),
+                            Choice(label="Specialized domain expert"),
+                        ],
+                    ),
+                    Question(
+                        question="Write your skill guidelines (the rules / methodology for this mode)",
+                        header="Skill",
+                        options=[
+                            Choice(label="(empty — edit the .md file later)"),
+                            Choice(label="(type your guidelines below)"),
+                        ],
+                    ),
+                ],
+            )
+        )
+
+        if not isinstance(result, AskUserQuestionResult) or result.cancelled or not result.answers:
+            await self._mount_and_scroll(UserCommandMessage("Mode creation cancelled."))
+            return
+
+        # Extract name
+        name_answer = next(
+            (a for a in result.answers if "name" in a.question.lower()), None
+        )
+        raw_name = (name_answer.answer if name_answer else "").strip().lower()
+        name = raw_name.replace(" ", "-")
+        if not name:
+            await self._mount_and_scroll(
+                ErrorMessage("Name cannot be empty.", collapsed=self._tools_collapsed)
+            )
+            return
+        if name in self.agent_loop.agent_manager.available_agents:
+            await self._mount_and_scroll(
+                ErrorMessage(
+                    f"Mode `{name}` already exists.",
+                    collapsed=self._tools_collapsed,
+                )
+            )
+            return
+
+        # Extract safety
+        safety_answer = next(
+            (a for a in result.answers if "safety" in a.question.lower()), None
+        )
+        safety_str = (safety_answer.answer if safety_answer else "neutral").strip().lower()
+        try:
+            safety = AgentSafety(safety_str)
+        except ValueError:
+            safety = AgentSafety.NEUTRAL
+            safety_str = "neutral"
+
+        # Extract description
+        desc_answer = next(
+            (a for a in result.answers if "description" in a.question.lower()), None
+        )
+        description = (desc_answer.answer if desc_answer else "").strip()
+
+        # Extract skill guidelines (free text from user)
+        skill_answer = next(
+            (a for a in result.answers if "skill" in a.question.lower()), None
+        )
+        raw_skill = (skill_answer.answer if skill_answer else "").strip()
+        # Discard placeholder choices — treat them as empty
+        if raw_skill.startswith("(") and raw_skill.endswith(")"):
+            raw_skill = ""
+
+        display_name = name.replace("-", " ").title()
+
+        # --- Step 2: build the .md prompt file ---
+        intro = (
+            f"You are now in **{display_name} Mode**. "
+            f"The following guidelines take priority over the general rules above. "
+            f"When there is a conflict, these rules win.\n"
+        )
+        md_content = f"{intro}\n{raw_skill}\n" if raw_skill else f"{intro}"
+
+        # Save .md to ~/.vibe/prompts/<name>.md (where config.py resolves custom prompts)
+        prompts_dir = GLOBAL_PROMPTS_DIR.path
+        prompts_dir.mkdir(parents=True, exist_ok=True)
+        md_path = prompts_dir / f"{name}.md"
+        md_path.write_text(md_content, encoding="utf-8")
+
+        # --- Step 3: save TOML with system_prompt_id pointing to the .md ---
+        toml_data: dict[str, Any] = {
+            "display_name": display_name,
+            "description": description,
+            "safety": safety_str,
+            "system_prompt_id": name,
+        }
+
+        import tomli_w
+
+        agents_dir = GLOBAL_AGENTS_DIR.path
+        agents_dir.mkdir(parents=True, exist_ok=True)
+        toml_path = agents_dir / f"{name}.toml"
+        toml_path.write_bytes(tomli_w.dumps(toml_data).encode())
+
+        # --- Step 4: register the agent live ---
+        profile = AgentProfile.from_toml(toml_path)
+        self.agent_loop.agent_manager.register_agent(profile)
+
+        await self._mount_and_scroll(
+            UserCommandMessage(
+                f"## Mode Created: **{display_name}**\n\n"
+                f"- **Name:** `{name}`\n"
+                f"- **Safety:** {safety_str}\n"
+                f"- **TOML:** `{toml_path}`\n"
+                f"- **Skill prompt:** `{md_path}`\n\n"
+                f"Edit the `.md` file to add or refine the skill guidelines.\n"
+                f"The prompt is composed on top of `cli.md`.\n\n"
+                f"Use `Shift+Tab` to cycle to it."
+            )
+        )
+
     async def _switch_session(self, target_id: str) -> None:
         """Perform the actual session switch: hide old messages, show new ones."""
         if target_id == self.session_manager.active_id:

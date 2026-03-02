@@ -204,7 +204,7 @@ class TestAgentApplyToConfig:
         )
         result = agent.apply_to_config(base)
         assert result.system_prompt_id == "cc"
-        assert result.system_prompt == "Global custom prompt"
+        assert "Global custom prompt" in result.system_prompt
 
 
 class TestAgentProfileOverrides:
@@ -679,3 +679,194 @@ class TestDebugAgent:
         debug_tools = set(agent.tool_manager.available_tools.keys())
         assert debug_tools == default_tools
         assert agent.agent_profile.name == BuiltinAgentName.DEBUG
+
+
+class TestCustomModeInstructions:
+    def test_agent_profile_default_instructions_empty(self) -> None:
+        profile = AgentProfile(
+            name="test",
+            display_name="Test",
+            description="Test agent",
+            safety=AgentSafety.NEUTRAL,
+        )
+        assert profile.instructions == ""
+
+    def test_agent_profile_with_instructions(self) -> None:
+        profile = AgentProfile(
+            name="frontend",
+            display_name="Frontend Expert",
+            description="React specialist",
+            safety=AgentSafety.NEUTRAL,
+            instructions="You are a React expert. Use functional components.",
+        )
+        assert profile.instructions == "You are a React expert. Use functional components."
+
+    def test_from_toml_reads_instructions(self, tmp_path: Path) -> None:
+        toml_file = tmp_path / "frontend.toml"
+        toml_file.write_text(
+            'display_name = "Frontend Expert"\n'
+            'description = "React specialist"\n'
+            'safety = "neutral"\n'
+            'instructions = "You are a React expert."\n'
+            'active_model = "codestral-latest"\n'
+        )
+        profile = AgentProfile.from_toml(toml_file)
+        assert profile.name == "frontend"
+        assert profile.instructions == "You are a React expert."
+        assert profile.overrides == {"active_model": "codestral-latest"}
+
+    def test_from_toml_without_instructions(self, tmp_path: Path) -> None:
+        toml_file = tmp_path / "basic.toml"
+        toml_file.write_text(
+            'display_name = "Basic"\n'
+            'description = "Basic agent"\n'
+        )
+        profile = AgentProfile.from_toml(toml_file)
+        assert profile.instructions == ""
+
+    def test_from_toml_instructions_not_in_overrides(self, tmp_path: Path) -> None:
+        """Instructions should be popped from data, not leak into overrides."""
+        toml_file = tmp_path / "custom.toml"
+        toml_file.write_text(
+            'instructions = "Be helpful."\n'
+            'active_model = "test-model"\n'
+        )
+        profile = AgentProfile.from_toml(toml_file)
+        assert "instructions" not in profile.overrides
+        assert profile.overrides == {"active_model": "test-model"}
+
+    def test_builtin_agents_have_no_instructions(self) -> None:
+        """Builtin agents use system_prompt_id, not inline instructions."""
+        for name, profile in BUILTIN_AGENTS.items():
+            assert profile.instructions == "", (
+                f"Builtin agent '{name}' should not have inline instructions"
+            )
+
+
+class TestModeCommand:
+    """Tests for the /mode command registration and TOML writing logic."""
+
+    def test_mode_command_registered(self) -> None:
+        from vibe.cli.commands import CommandRegistry
+
+        registry = CommandRegistry()
+        cmd = registry.find_command("/mode")
+        assert cmd is not None
+        assert cmd.handler == "_mode_command"
+
+    def test_mode_command_args_create(self) -> None:
+        from vibe.cli.commands import CommandRegistry
+
+        registry = CommandRegistry()
+        args = registry.get_command_args("/mode create")
+        assert args == "create"
+
+    def test_mode_command_args_empty(self) -> None:
+        from vibe.cli.commands import CommandRegistry
+
+        registry = CommandRegistry()
+        args = registry.get_command_args("/mode")
+        assert args == "" or args is None
+
+    def test_mode_toml_roundtrip(self, tmp_path: Path) -> None:
+        """Write a TOML file and read it back via from_toml."""
+        import tomli_w
+
+        toml_data = {
+            "display_name": "Frontend Expert",
+            "description": "React specialist",
+            "safety": "neutral",
+            "instructions": "You are a React expert. Use functional components.",
+        }
+        toml_path = tmp_path / "frontend-expert.toml"
+        toml_path.write_bytes(tomli_w.dumps(toml_data).encode())
+
+        profile = AgentProfile.from_toml(toml_path)
+        assert profile.name == "frontend-expert"
+        assert profile.display_name == "Frontend Expert"
+        assert profile.description == "React specialist"
+        assert profile.safety == AgentSafety.NEUTRAL
+        assert profile.instructions == "You are a React expert. Use functional components."
+
+    def test_mode_toml_minimal(self, tmp_path: Path) -> None:
+        """A TOML with only safety still produces a valid profile."""
+        import tomli_w
+
+        toml_data = {"safety": "safe"}
+        toml_path = tmp_path / "minimal.toml"
+        toml_path.write_bytes(tomli_w.dumps(toml_data).encode())
+
+        profile = AgentProfile.from_toml(toml_path)
+        assert profile.name == "minimal"
+        assert profile.display_name == "Minimal"
+        assert profile.safety == AgentSafety.SAFE
+        assert profile.instructions == ""
+
+    def test_created_mode_registers_in_manager(self, tmp_path: Path) -> None:
+        """A dynamically created profile can be registered and retrieved."""
+        import tomli_w
+
+        toml_data = {
+            "display_name": "Reviewer",
+            "description": "Code review mode",
+            "safety": "neutral",
+            "instructions": "Review code carefully.",
+        }
+        toml_path = tmp_path / "reviewer.toml"
+        toml_path.write_bytes(tomli_w.dumps(toml_data).encode())
+
+        profile = AgentProfile.from_toml(toml_path)
+        config = build_test_vibe_config()
+        manager = AgentManager(lambda: config)
+        manager.register_agent(profile)
+
+        assert "reviewer" in manager.available_agents
+        assert manager.available_agents["reviewer"].instructions == "Review code carefully."
+
+    def test_mode_toml_with_system_prompt_id(self, tmp_path: Path) -> None:
+        """system_prompt_id in TOML goes into overrides, not a top-level field."""
+        import tomli_w
+
+        toml_data = {
+            "display_name": "My Mode",
+            "description": "Custom mode",
+            "safety": "neutral",
+            "system_prompt_id": "my-mode",
+        }
+        toml_path = tmp_path / "my-mode.toml"
+        toml_path.write_bytes(tomli_w.dumps(toml_data).encode())
+
+        profile = AgentProfile.from_toml(toml_path)
+        assert profile.name == "my-mode"
+        assert profile.overrides.get("system_prompt_id") == "my-mode"
+
+    def test_custom_prompt_resolved_by_config(self, tmp_path: Path) -> None:
+        """A .md file in prompts dir gets composed on top of CLI base."""
+        from unittest.mock import patch
+
+        from vibe.core.config import VibeConfig
+        from vibe.core.prompts import SystemPrompt
+
+        # Write a custom prompt file
+        md_file = tmp_path / "my-mode.md"
+        md_file.write_text("You are in My Mode.\n\n## Rules\n- Be helpful\n")
+
+        config = build_test_vibe_config()
+        config_data = config.model_dump()
+        config_data["system_prompt_id"] = "my-mode"
+
+        with patch("vibe.core.config.PROMPTS_DIR") as mock_local, \
+             patch("vibe.core.config.GLOBAL_PROMPTS_DIR") as mock_global:
+            mock_local.path = tmp_path / "nonexistent"
+            mock_global.path = tmp_path
+            result_config = VibeConfig.model_validate(config_data)
+            prompt = result_config.system_prompt
+
+        # Should contain CLI base
+        cli_base = SystemPrompt.CLI.read()
+        assert cli_base[:50] in prompt
+        # Should contain custom overlay
+        assert "You are in My Mode." in prompt
+        assert "Be helpful" in prompt
+        # Should have separator
+        assert "---" in prompt

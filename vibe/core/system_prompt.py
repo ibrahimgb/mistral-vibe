@@ -420,6 +420,14 @@ def get_universal_system_prompt(
 ) -> str:
     sections = [config.system_prompt]
 
+    # Compose inline instructions from the active agent profile on top of the
+    # base system prompt.  This lets custom TOML agents embed their own
+    # behavioural instructions without needing a separate .md file.
+    if agent_manager.active_profile.instructions:
+        sections.append(
+            f"---\n\n{agent_manager.active_profile.instructions.strip()}"
+        )
+
     if config.include_commit_signature:
         sections.append(_add_commit_signature())
 

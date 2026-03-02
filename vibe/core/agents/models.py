@@ -50,6 +50,7 @@ class AgentProfile:
     safety: AgentSafety
     agent_type: AgentType = AgentType.AGENT
     overrides: dict[str, Any] = field(default_factory=dict)
+    instructions: str = ""
 
     def apply_to_config(self, base: VibeConfig) -> VibeConfig:
         from vibe.core.config import VibeConfig as VC
@@ -67,6 +68,7 @@ class AgentProfile:
             description=data.pop("description", ""),
             safety=AgentSafety(data.pop("safety", AgentSafety.NEUTRAL)),
             agent_type=AgentType(data.pop("agent_type", AgentType.AGENT)),
+            instructions=data.pop("instructions", ""),
             overrides=data,
         )
 

@@ -440,7 +440,11 @@ class VibeConfig(BaseSettings):
                 ".md"
             )
             if custom_sp_path.is_file():
-                return custom_sp_path.read_text()
+                custom_content = custom_sp_path.read_text()
+                # Custom prompt files are composed on top of the base CLI prompt
+                # so they inherit tool usage rules, formatting, etc.
+                base = SystemPrompt.CLI.read()
+                return f"{base}\n\n---\n\n{custom_content}"
 
         raise MissingPromptFileError(
             self.system_prompt_id, str(PROMPTS_DIR.path), str(GLOBAL_PROMPTS_DIR.path)

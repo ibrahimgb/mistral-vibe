@@ -101,6 +101,11 @@ class CommandRegistry:
                 handler="_switch_session_command",
                 no_interrupt=True,
             ),
+            "mode": Command(
+                aliases=frozenset(["/mode"]),
+                description="List modes, or create a new custom mode (/mode create)",
+                handler="_mode_command",
+            ),
         }
 
         for command in excluded_commands:
